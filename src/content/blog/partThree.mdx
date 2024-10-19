@@ -1,0 +1,73 @@
+---
+title: AI Visualised - Part III
+description: Looking at how we can build an intuition for neural networks visually
+pubDate: 2024-10-16T12:04:48.328Z
+heroImage: /partThree.jpg
+author: Kyle Smith
+---
+
+import Plot from "../../components/Plot.astro";
+
+The year is 2024 and we have walking talking robots, we are catching rockets and we have driverless cars. I want us for a moment, to take a step back in time, to the year of 1940 and to the city of Bristol. Here we will find a neuroligist by the name of Dr. William Grey Walter who unknowingly designed one of the earliest forms of what would later be referred to as Artificial Intelligence. A robot that was able to use light to navigate its environment, he claimed that these robots had the equivalent of two whole neurons and he specaluted that by adding more neurons they would only become more intelligent(spoiler: he was right).
+
+!['Tortoise' robot created by Dr. William Grey Walter](/tortoise.jpeg)
+<div align="center"><i>'Tortoise' robot created by Dr. William Grey Walter (Credit [National Museum Of American History](https://www.google.com/url?sa=i&url=https%3A%2F%2Famericanhistory.si.edu%2Fcollections%2Fnmah_879329&psig=AOvVaw2Jn2PCk1YEfYr1HajkeFNU&ust=1729100823888000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJC4ytX4kIkDFQAAAAAdAAAAABAE))</i></div>
+
+Now this robot marks the first concept of AI and robotics, but this is not the first occurrence of 'computer learning' as the robot was purely mechanical, but still captured one of the core tenets of Artificial Intelligence, "recognition is cognition". By recognising light these mechanical robots were able to navigate their environment, this captures how we as humans think and learn. So using this connection we will explore AI using visual tools and the latest research in neural network interpratability to gain an intuition for how they work. 
+
+### The Perceptron
+The 'Tortoise' robot was a mechanical robot and thus did not follow a computer program so the concept of 'computer learning' would remain a mystery until the year of 1957. This is when Frank Rosenblatt developed the *perceptron* model, the first model that was able to successfully simulate the human cognitive process. His discovery is regarded by most as the match that started the wild fire that is Artificial Intelligence, that has continued to spread to this day. The perceptron model (also referred to as a neuron) is still used to today to describe the most simple form of neural network. 
+
+![Perceptron Model](/perceptron.png)
+<div align="center"><i>Biological Neuron vs Perceptron Model</i></div>
+
+To get a better intuition for the perceptron model we will use an example scenario, consider the scenario where you want to predict the output of an AND gate. An AND gate is a digital circuit that is energized when, both of its inputs are energized. To model this conceptually we say that the circuit will return a value of 1 when both of its inputs are 1 and 0 otherwise. We summarise the behaviour of the AND gate in the table below:
+
+<div align="center">![And Gate](/and.png)</div>
+<div align="center"><i>And Gate ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.build-electronic-circuits.com%2Fand-gate%2F&psig=AOvVaw1X6Qp2SQOJJkVP1JzzFhCl&ust=1729102980864000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDxyNqAkYkDFQAAAAAdAAAAABAJ))</i></div>
+
+A and B are the inputs to the AND gate and Q is the variable representing the output of the AND gate. If we plot the possible inputs of the AND gate, we see something interesting emerge.
+
+![And Gate Output Plot](/andplot.png)
+
+We can clearly separate the points using a single line, where the points below the line mean the AND gate will output $0$ and the point above the line will output $1$. This phenomenom means that the problem of predicting the output of an AND gate is *linearly separable*. Meaning that we can separate the data into two classes using what is formally known as a *hyperplane*, put simply it means we can draw a straight line between the data points such that we can classify the points into two distinct classes. So the problem of discovering this hyperplane is what we can solve by using the *perceptron* model.
+
+A *perceptron* is a model which given input will always produce an output, it produces this output by taking a list of numbers and computing a weighted sum of these numbers and a list of randomly initialised numbers referred to as *weights*, this scalar value is passed to a special mathematical function called an **activation function**, which decides whether the *perceptron* should 'activate' or not. The *weights* are the *parameters* of the *perceptron* and are what we can tune to make the *perceptron* behave the way we want it to. Below we define the 'architecture' of the *perceptron* for predicting the output of an AND gate:
+
+![Perceptron Architecure for And gate prediction](/perceptronAnd.png)
+
+Our perceptron takes two inputs lablled A and B, the weighted sum is calculated by performing the following operation:
+
+<div align="center">
+    $S = (A \times w_1) + (B \times w_2)$
+</div>
+
+This is then passed through to the activation function, the activation function will return $1$ if the weighted sum is positive and $0$ if the weighted sum is negative.
+
+<div align="center">
+    Step Function: $f(S) = 1$ if $S < 0.5$ else $0$
+</div>
+
+We choose the value of $0.5$ sort of arbitrarily as it lies in the middle of $0$ and $1$, which is the domain of the input variables.
+
+To train our *perceptron* to correctly predict output of an AND gate, we need to train it on some examples. The possible inputs of the AND gate will be the examples which we will train our *perceptron* on(referred to as training data from here on). As said by author John Bradsaw "Mistakes are our teachers", the perceptron has no perception of what an AND gate is, so we need to instill this knowledge into the model. Since we know what the output of an AND gate should be, we can label the inputs of the traning data and 
+'help' the perceptron when it incorrectly predicts the output for a given set of data points. 
+
+We do this by calculating the difference between the output of the perceptron and the actual expected output. 
+This gives as an *error*, which we use to nudge the weights in a direction such that the output of the perceptron becomes closer to the expected output. To illustrate this visually, let us assume that the values of the weights of the *perceptron* are initialised randomly in the range $[-2,2]$ (arbitrarily chosen) and can be any real number in this range. 
+To calculate the error we compute the difference between the value predicted by the perceptron and the actual output of the AND gate given the input variables. The error formula is more generally referred to as the loss function(there are many loss functions, but this is the simplest). 
+Using the weights and the possible range of inputs and the loss function we can calculate all possible error values for our input domain. Plotting this result in a 3D space, will allow us to construct what is known as the loss landscape. 
+
+<Plot htmlPath="/perceptronloss.html" />
+
+The landscape is a bit blocky, but this is due to our linear activation function, an activation function such as the $tanh$ function would yield a smoother surface. Nonetheless we can see that the loss function will be $0$ when the weight $w_1$ is any value in the range $[0.1, 0.5]$ and when $w_2$ is $0.5$. So the loss landscape has given us the 'answer' to our perceptron learning problem, but quickly becomes infeasible to construct for more complicated problems.
+This is however a nice guide, since we know what values we need to work towards for the weights of the perceptron. To train this perceptron we will define a simple algorithm:
+
+```text
+1. Initialize the weights randomly in the range [-2,2]
+2. 
+```
+
+<Plot htmlPath="/transformation.html" refresh/>
+
+

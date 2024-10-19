@@ -83,11 +83,12 @@ const posts = (await getCollection('blog')).sort(
 					font-size: 1.563em;
 				}
 			}
+			
 		</style>
 	</head>
 	<body>
 		<Header />
-		<main>
+		<main transition:animate="slide">
 			<section>
 				<ul>
 					{

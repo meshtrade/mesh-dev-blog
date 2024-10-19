@@ -1,0 +1,194 @@
+---
+title: AI Visualised - Part I
+description: Looking at how we can build an intuition for neural networks visually
+pubDate: 2024-10-16T14:04:48.328Z
+heroImage: /partOne.jpg
+author: Kyle Smith
+---
+
+import Scroll from "../../components/Scroll.astro";
+import Plot from "../../components/Plot.astro";
+import { Image } from 'astro:assets';
+
+<Scroll id="AI Visualised - Part I" />
+
+The year is 2024 and we have walking-talking robots, we are catching rockets and we have driverless cars. I want us for a moment, to take a step back in time, to the year of 1940 and to the city of Bristol. 
+Here we will find a neurologist by the name of Dr. William Grey Walter who unknowingly designed one of the earliest forms of what would later be referred to as Artificial Intelligence. 
+His battery-powered robots were models to test his theory that a minimum number of brain cells can control complex behavior and choice. A rotating photoelectric cell, the machine’s “eye,” scans the horizon continuously until it detects an external light. Scanning stops and the machine either moves toward the light source or, if the source is too bright, moves away.
+He claimed that these robots had the equivalent of two whole neurons and further specaluted that by adding more neurons they would only become more intelligent (spoiler: he was right).
+
+
+<Image src="/tortoise.jpeg" alt="tortoise robot" width={1020} height={490} loading="lazy"/>
+<div align="center"><i>Fig 1: 'Tortoise' robot created by Dr. William Grey Walter ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Famericanhistory.si.edu%2Fcollections%2Fnmah_879329&psig=AOvVaw2Jn2PCk1YEfYr1HajkeFNU&ust=1729100823888000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJC4ytX4kIkDFQAAAAAdAAAAABAE))</i></div>
+
+Now this robot marks the first concept of AI and robotics, but this is not the first occurrence of 'computer learning' as the robot was purely mechanical, but still captured one of the core tenets of Artificial Intelligence, "recognition is cognition". 
+By recognising light these mechanical robots were able to 'think' about navigating. AI systems are experts in pattern recognition which in turn allows them to give the illusion of reasoning. As humans we have similar cognitive systems just with an extra layer
+allowing for more complex reasoning and comprehension. However exploring this tenet is still useful in understanding and appreciating the intuition behind AI as mere humans.
+So using this connection we will explore AI by taking a closer look at the internals from visual perspective. 
+
+### The Perceptron
+---
+
+The 'Tortoise' robot was a mechanical robot and thus did not follow a computer program so the concept of 'computer learning' would remain a mystery until the year of 1957. 
+This is when Frank Rosenblatt developed the *perceptron* model, the first model that was able to successfully simulate the human cognitive process at a base level. 
+His discovery is regarded by most as the match that started the wild fire, that is Artificial Intelligence, that has continued to spread to this day. 
+The perceptron model (also referred to as a neuron) is still used to today to describe the most simple form of neural network. A perceptron is meant to represent a single
+biological neuron. In the perceptron model it takes one or more inputs or stimuli and depending on the inputs will 'activate' which means it returns a non-zero value. 
+
+<Image src="/perceptron.png" alt="perceptron model" width={1020} height={490} loading="lazy"/>
+<div align="center"><i>Biological Neuron vs Perceptron Model</i></div>
+
+To get a better intuition for the perceptron model we will use an example scenario, consider the scenario where you want to predict the output of an AND gate. An AND gate is a digital circuit that is energized when, both of its inputs are energized. To model this conceptually we say that the circuit will return a value of 1 when both of its inputs are 1 and 0 otherwise. We summarise the behaviour of the AND gate in the table below:
+
+<div align="center">![And Gate](/and.png)</div>
+<div align="center"><i>Fig 2: And Gate ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.build-electronic-circuits.com%2Fand-gate%2F&psig=AOvVaw1X6Qp2SQOJJkVP1JzzFhCl&ust=1729102980864000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDxyNqAkYkDFQAAAAAdAAAAABAJ))</i></div>
+
+A and B are the inputs to the AND gate and Q is the variable representing the output of the AND gate. If we plot the possible inputs and outputs of the AND gate, we see something interesting emerge.
+
+<Plot htmlPath="/andgateio.html" />
+<div align="center"><i>Fig 3: AND Gate Inputs</i></div>
+
+We can clearly separate the points using a single plane, where the points below the plane mean the AND gate will output $0$ and the point above the plane will output $1$. 
+This phenomenom means that the problem of predicting the output of an AND gate is *linearly separable*. 
+Meaning that we can separate the data into two classes using what is formally known as a *hyperplane*, put simply, it means we can construct a plane between the data points such that we can classify the points into two distinct classes. 
+In this trivial example we can easily find the hyerplane by hand, but for the sake of argument we will assume that we can not easily find this hyperplane (this is the case for more complex problems). 
+
+A *perceptron* is a model which is given a pre-defined list of input values and it produces a single output. A perceptron computes the output by performing
+a weighted sum between the input values and a list of randomly initialised weights and feeds the result through an activation function to obtain an output. The activation function
+is responsible for determining whether the neuron should fire and is consequently usually a function that returns some value between $0$ and $1$. 
+The *weights* are the *parameters* of the *perceptron* and are updated during the 'learning' procedure. 
+Below we define the 'architecture' of the *perceptron* for predicting the output of an AND gate:
+
+![Perceptron Architecure for And gate prediction](/perceptronAnd.png)
+<div align="center"><i>Fig 4: Perceptron Architecture</i></div>
+
+Intuitively the weights of the perceptron are what will have the greatest impact on the behaviour of the perceptron. 
+The weights are responsible for capturing the knownledge of the perceptron. This realisation is actually a critical component in understanding how perceptrons and neural networks
+are able to learn.
+
+> Weights encode knowledge
+
+Our perceptron takes two inputs lablled A and B (gate inputs), the weighted sum is calculated by performing the following operation:
+
+<div align="center">
+    $S = (A \times w_1) + (B \times w_2)$
+</div>
+
+This is then passed through to the activation function, the activation function will return $1$ if the weighted sum is positive and $0$ if the weighted sum is less than $0.5$. 
+
+<div align="center">
+    Activation Function: $f(S) = 1$ if $S > 0.5$ else $0$
+    <Plot htmlPath="/activation.html" />
+</div>
+
+We choose the value of $0.5$ sort of arbitrarily as it lies in the middle of $0$ and $1$, which is the domain of the input variables. This type of function is commonly referred to as
+a step function and is useful in our case for clamping the weighted sum to correspond to a valid AND gate output.
+
+### Training
+---
+
+Now how do we get the perceptron to actually emulate an AND gate? Well we need to train it.
+To train our *perceptron* to correctly predict output of an AND gate, we need to train it on some examples. 
+The possible inputs of the AND gate will be the examples which we will train our *perceptron* on(referred to as training data from here on). 
+As said by author John Bradsaw "mistakes are our teachers", the perceptron has no perception of what an AND gate is, so we need to instill this knowledge into the model. 
+Since we know what the output of an AND gate should be, we can label the inputs of the traning data and 'help' the perceptron when it incorrectly predicts the output for a given set of data points. 
+
+We do this by calculating the difference between the output of the perceptron and the actual expected output. For this scenario we will be using the mean-squared error function. 
+This gives as an *error*, which we use to nudge the weights in a direction such that the output of the perceptron becomes closer to the expected output. The value of the error is what we
+want to minimise. Let us assume that the values of the weights of the *perceptron* are initialised randomly in the range $[-2,2]$ (arbitrarily chosen) and can be any real number in this range. 
+The error formula is more generally referred to as the loss function(there are many loss functions, but this is one suitable for our problem). 
+We will formalise the loss function as follows:
+
+<div align="center">
+    $\mathcal{L}(\hat y, y) = \frac{1}{n}\sum_{i=1}^n\hat Y - Y$
+
+    *where $\hat Y$ is a list of actual outputs of the AND gate and $Y$ is a list of observed outputs from the perceptron*
+</div>
+
+Now it would be useful if we could plot this loss function to get a better understanding what our perceptron is trying to optimise.
+Using the weights and all possible real numbered values in the range $[-2,2]$ and the loss function definition we can calculate all possible error values for our input domain and plot them. 
+Plotting all of these points allows us to construct what is known as a loss landscape. 
+
+<Plot htmlPath="/perceptronloss.html" />
+
+A loss landscape is a visual representation of the 'terrain' our perceptron will have to traverse to find the weight values that minimise the loss/error value. 
+The loss landscape is a valueable tool for gaining insight into model training dynamics. At a high-level we see a fairly flat landscape, which can make it difficult
+for the model to learn, since changing the weights has no noticeable effect on the loss. The flat areas of the landscape are commonly referred to as flat minima. 
+The landscape also has high ridges, where there is a steep increase in loss, which make it difficult for the perceptron to move through. 
+
+With this in mind it should be clear to see that the initial value of the weights will impact how easy the perceptron will be able to find the optimal weight pair that minimises the loss function. 
+Consider our weight values are initialized such that the loss function output value is on the bottom purple plane. We will have to traverse multiple flat minima until we reach
+the bottom of the ridges which will show improvement in the loss function value. 
+So the loss landscape has given us the 'answer' to our perceptron learning problem, but quickly becomes infeasible to construct for more complicated problems, so is typically only used for visualisation of simpler AI models.
+This is however a nice guide, since we know what values we need to work towards for the weights of the perceptron. To train this perceptron we will define a simple algorithm:
+
+```text
+1. Initialize the weights randomly in the range [-2,2]
+2. Iterate over each row in the possible 
+   inputs from AND gate table(Fig. 2)
+3. Calculate the weighted sum: (A * w1) + (B * w2)
+4. Apply activation function 
+5. Calculate difference between value from activation function 
+   and the actual expected AND gate output value: L = expected - predicted
+6. Update weights according to difference: 
+    6.1 w1' = w1 + (learning_rate) * error * A
+    6.2 w2' = w2 + (learning_rate) * error * B
+7. Repeat 2-6 some amount of times until satisfactory
+```
+<div align="center">
+    *Algorithm 1: Perceptron Learning Algorithm*
+</div>
+
+By updating the weights we are indirectly traversing the loss landscape. You might have noticed a new variable *learning_rate*, the learning rate is usually a value between $0$ and $1$ and is used to 
+scale down the magnitude of the error value. The input values are included in the weight update to also help in scaling the weight value to be closer to the input, so that the magnitudes of the 
+weights still make sense. 
+
+To better understand the optimization step (6) in the algorithm, consider a sticky ball that we place on some random point on the loss landscape with a position corresponding to the values of the weights ($w_1$ and $w_2$), where the position of the ball
+maps to the corresponding loss value of the perceptron. Since the ball is sticky and is also not affected by the slope of the landscape so it needs to be rolled to be able to move. 
+The direction we roll the ball in depends on the error and the amount of force we apply depends on the learning rate.
+A higher learning rate can be detremental when training a perceptron or a neural network, if you apply a lot of force the ball might overshoot its target (Fig 5: Right), so generally learning rates are set to very 
+small numbers, but this is still problem depedent.
+
+![Gradient](/gradient.png)
+<div align="center"><i>Fig 5: Ball Rolling Learning Analogy ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.javatpoint.com%2Fgradient-descent-in-machine-learning&psig=AOvVaw3wUMJNd450L0Nt1atEeI73&ust=1729177462414000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDZ7JWWk4kDFQAAAAAdAAAAABAE))</i></div>
+
+This analogy is the core idea behind the backpropagation algorithm, which is another revolutionary algorithm that allows us to efficiently train neural networks. 
+
+Now with algorithm in hand, we can finally attempt to train the perceptron. Now a hyperplane is a useful visual tool in seeing how we can separate the data, but how is the input
+actually transformed into a possible output for an AND gate?
+Using some linear algebra we can reformulate our perceptron computation as the dot product between two vectors:
+
+<div align="center">
+    $S = \langle A, B \rangle \cdot W$
+</div>
+
+A dot product between two vectors can be interpreted as a measure for how much of one vector lies in the direction of the other, in this case it is used to project the input vector to the weight vector in a sense.
+So when we give the perceptron a specific input all it is doing is translating those points using a simple projection.
+Fixing $w_1 = 0.1$ and $w_2 = 0.5$ we can visualise the ideal transformation in the animation below (click reload icon on bottom right to play again). 
+
+<Plot htmlPath="/transformation.html" refresh/>
+
+Here we see how the input vectors ($[0,0]$, $[1,0]$, $[0,1]$) are all translated to the coordinate $0$ using the fixed weights, for illustration purposes we show that it goes to $(0,0)$, but is equivalent to computing the value of $0$. 
+This is the ideal transformation and depends on the finding the optimal values for the weights $w_1$ and $w_2$, but by applying the learning algorithm we should be able to converge to the optimal solution.
+Now let's take a look at how the perceptron learns this translation. 
+
+<Plot htmlPath="/loss_and.html" />
+
+Here we see that our perceptron was able to successfully learn to emulate the AND gate after roughly 35 iterations(epochs). The final weights obtained are what we expected $w_1 = 0.1$ and $w_2 = 0.5$ (I did cheat a bit and set the initial weights to -2 and 2 respectively to get a nicer loss graph).
+
+### What's Next?
+---
+
+Our perceptron was able to easily learn to emulate an AND gate, but what about an XOR gate? An XOR gate or exclusive or gate, is a circuit that is enerfized when exactly only one of its inputs are energized.
+
+<div align="center">
+![XOR Gate](/xor.png)
+</div>
+<div align="center"><i>Fig 6: XOR Gate ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.build-electronic-circuits.com%2Fxor-gate%2F&psig=AOvVaw0-514KxhLrsRZLPJKxj-Jt&ust=1729190950216000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMiU_7TIk4kDFQAAAAAdAAAAABAE))</i></div>
+
+Plotting the possible input values and their corresponding activations, we get the following:
+
+<Plot htmlPath="/xor.html" />
+
+Here we see that we can not separate the points with a straight hyperplane, but rather with a complex curve. To find this hyperplane we will need a more complex transformation, which is not something
+that a perceptron can do on its own, but with the help of other perceptrons we can make this a reality. To be continued in Part II...

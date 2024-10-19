@@ -4,10 +4,11 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import { Image } from 'astro:assets';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, author } = Astro.props;
 ---
 
 <html lang="en">
@@ -48,6 +49,11 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
+			.author {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+				font-size: small;
+			}
 			.last-updated-on {
 				font-style: italic;
 			}
@@ -59,10 +65,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<main>
 			<article>
 				<div class="hero-image">
-					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
+					{heroImage && <Image transition:name={`${title} image`} width={910} height={510} src={heroImage} alt="" loading="eager"/>}
 				</div>
 				<div class="prose">
-					<div class="title">
+					<div transition:name={`${title} title`} class="title">
 						<div class="date">
 							<FormattedDate date={pubDate} />
 							{
@@ -74,12 +80,33 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 							}
 						</div>
 						<h1>{title}</h1>
-						<hr />
+						<div class="author">
+							Author: {author}
+						</div>
 					</div>
+					<hr />
 					<slot />
 				</div>
 			</article>
 		</main>
 		<Footer />
 	</body>
+	<script define:vars={{title}}>
+		const scroll = document.getElementById(title) ?? new HTMLElement();
+
+		window.onscroll = () => {
+			if (document.documentElement.scrollTop <= 500) {
+				scroll.style.display = "none";
+				return;
+			} 
+			scroll.style.display = "block";
+		};
+
+		scroll?.addEventListener("click", e => {
+			document.documentElement.scrollTo({
+				behavior: "smooth",
+				top: 0,
+			});
+		});
+	</script>
 </html>
