@@ -7,7 +7,7 @@
 
 ## Writing a blog post
 
-1. Blogs live in `src/content/blog/`
+1. Blogs live in `ui/src/content/blog/`
 2. Add either a `.mdx` or `.md` file 
 3. Each blog needs to start with following heading:
 ```

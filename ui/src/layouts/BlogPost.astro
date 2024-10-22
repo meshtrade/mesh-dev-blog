@@ -1,0 +1,133 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { Image } from 'astro:assets';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate, heroImage, author } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+			}
+			.hero-image {
+				width: 100%;
+			}
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1;
+			}
+			.title h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.date {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+			.author {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+				font-size: medium;
+				font-style: italic;
+			}
+			.last-updated-on {
+				font-style: italic;
+			}
+			article a::before {
+				content: '';
+			}
+			article a::before,
+			article a::after {
+    			position: absolute;
+				width: 100%;
+				height: 1px;
+				background: linear-gradient(to right, #C500CF 0%, #DC0451 100%);;
+				top: 100%;
+				left: 0;
+				pointer-events: none;
+				transform-origin: 100% 50%;
+				transform: scale3d(0, 1, 1);
+				transition: transform 0.3s;
+			}
+			article a:hover::before {
+				transform-origin: 0% 50%;
+				transform: scale3d(1, 1, 1);
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <Image transition:name={`${title} image`} width={910} height={510} src={heroImage} alt="" loading="eager"/>}
+				</div>
+				<div class="prose">
+					<div transition:name={`${title} title`} class="title">
+						<div class="date">
+							<FormattedDate date={pubDate} />
+							{
+								updatedDate && (
+									<div class="last-updated-on">
+										Last updated on <FormattedDate date={updatedDate} />
+									</div>
+								)
+							}
+						</div>
+						<h1>{title}</h1>
+						<div class="author">
+							Author: <span class="mesh-text">{author}</span>
+						</div>
+					</div>
+					<hr />
+					<slot />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+	<script define:vars={{title}}>
+		const scroll = document.getElementById(title) ?? new HTMLElement();
+
+		window.onscroll = () => {
+			if (document.documentElement.scrollTop <= 500) {
+				scroll.style.display = "none";
+				return;
+			} 
+			scroll.style.display = "block";
+		};
+
+		scroll?.addEventListener("click", e => {
+			document.documentElement.scrollTo({
+				behavior: "smooth",
+				top: 0,
+			});
+		});
+	</script>
+</html>
