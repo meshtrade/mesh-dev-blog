@@ -56,7 +56,7 @@ A and B are the inputs to the AND gate and Q is the variable representing the ou
 If we plot the possible inputs of the AND gate, we see something interesting emerge.
 
 <Plot htmlPath="/html/partOne/and_boundary_manual.html" />
-<div align="center"><i>Figure 4: AND Gate Inputs ([Script]())</i></div>
+<div align="center"><i>Figure 4: AND Gate Inputs ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/and_boundary.py))</i></div>
 
 We can clearly separate the points using a single line, where the points below the line mean the AND gate will output $0$ and the point above the line will output $1$. 
 This line is conventionally called a *decision boundary*.
@@ -110,7 +110,7 @@ This is then passed through to the activation function, the activation function 
         1 & \text{if}\; S > 0 \\
         0 & \text{if}\; S \leq 0 \end{cases}$
     <Plot htmlPath="/html/partOne/activation.html" />
-    <i>Figure 6: Activation Function</i> 
+    <i>Figure 6: Activation Function ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/activation.py))</i> 
 </div>
 
 We choose the value of $0.0$ arbitrarily as it lies in the middle of $0$ and $1$, which is the domain of the input variables. This type of function is commonly referred to as
@@ -142,7 +142,7 @@ Using the weights and all possible real numbered values in the range $[-2,2]$ an
 Plotting all of these points allows us to construct what is known as a *loss landscape*. 
 
 <Plot htmlPath="/html/partOne/loss_landscape.html" />
-<div align="center"><i>Figure 7: Loss Landscape([Script]())</i></div>
+<div align="center"><i>Figure 7: Loss Landscape([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/loss_landscape.py))</i></div>
 
 A loss landscape is a visual representation of the 'terrain' our perceptron will have to traverse to find the weight values that minimise the loss/error value. 
 The loss landscape is a valuable tool for gaining insight into model training dynamics. At a high-level we see a fairly flat landscape with a single funnel structure in the middle.
@@ -174,7 +174,7 @@ This is however a nice guide, since we know what values we need to work towards 
 7. Repeat 2-6 some amount of times until satisfactory
 ```
 <div align="center">
-    *Algorithm 1: Perceptron Learning Algorithm*
+    *Algorithm 1: Perceptron Learning Algorithm* ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/train.py))
 </div>
 
 The perceptron learns by repeatedly trying to predict the AND gate output given an input sample. 
@@ -191,7 +191,7 @@ A coordinate on a xy-plane is referred to as a 2-dimensional vector. Vectors can
 Consider two vectors $\langle 1, 2, 3 \rangle$ and $\langle 4, 5, 6 \rangle$, the dot product can be visualised geometrically as follows:
 
 <Plot htmlPath="/html/partOne/dot_product.html"/>
-<div align="center"><i>Figure 8: Dot Product([Script]())</i></div>
+<div align="center"><i>Figure 8: Dot Product([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/dot_product.py))</i></div>
 
 A dot product between two vectors can be interpreted as a measure for how much of one vector lies in the direction of the other.
 The green line gives us an indication of this projection, but is not the actual answer to the dot product and is only used as a visual aid. Fundamentally the dot product measures
@@ -229,7 +229,7 @@ With this background, we can now look at an execution of our learning algorithm.
 </div>
 
 <Plot htmlPath="/html/partOne/loss_and.html" />
-<div align="center"><i>Figure 10: Training Loss For Perceptron ([Script]())</i></div>
+<div align="center"><i>Figure 10: Training Loss For Perceptron ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/train.py))</i></div>
 
 Here we see that our perceptron was able to successfully learn to emulate the AND gate after roughly $20$ iterations(epochs). 
 Plotting the loss values over the epochs we can relate the loss values to the loss landscape from Figure 7. 
@@ -238,7 +238,7 @@ with the ridges as it oscillates between $0.25$ and $0.5$, but luckily it seems 
 To better understand these loss values let's take a look at the values of the weights during the training process to see if we can plot the path through the loss landscape:
 
 <Plot htmlPath="/html/partOne/weights_and.html"/>
-<div align="center"><i>Figure 11: Perceptron Weights During Training ([Script]())</i></div>
+<div align="center"><i>Figure 11: Perceptron Weights During Training ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/train.py))</i></div>
 
 The final weights obtained are $w_1 = 0.15$ and $w_2 = 0.5$. The final bias value was $-0.6$.
 The weights seemed to move closer to each other over the epochs. 
@@ -263,7 +263,7 @@ With these final weight values and past weights we can also plot a path through 
 Sampling the weight values from the loss function every four epochs, we get the following trace:
 
 <Plot htmlPath="/html/partOne/loss_landscape_trace.html" />
-<div align="center"><i>Figure 12: Traced Loss Landscape ([Script]())</i></div>
+<div align="center"><i>Figure 12: Traced Loss Landscape ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/loss_landscape.py))</i></div>
 
 We clearly see that the perceptron was somehow able to even through the flat landscape 'know' where an optimal solution lied. 
 I unfortunately believe this to simply be a coincidence as the optimal solution required the weights to be positive and close to $0$ and during the training algorithm the weights were both lessened each epoch.
@@ -304,7 +304,7 @@ With the slope-intercept equation in hand we can now substitute the variables we
 Finally, we can plot the decision boundary:
 
 <Plot htmlPath="/html/partOne/and_boundary.html"/>
-<div align="center"><i>Figure 13: Trained AND Gate Decision Boundary ([Script]())</i></div>
+<div align="center"><i>Figure 13: Trained AND Gate Decision Boundary ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/and_boundary.py))</i></div>
 
 The perceptron actually found a very similar decision boundary to the one we drew by hand in Figure 4. 
 This visualisation also presents the role of the bias input, a seemingly worthless input value, but is actually used to move the decision boundary.
@@ -312,10 +312,10 @@ Without the bias input the decision boundary line can only go through the origin
 We can also see the evolution of this decision boundary during the training process:
 
 <Plot htmlPath="/html/partOne/train_animation.html"/>
-<div align="center"><i>Figure 14: AND Gate Decision Boundary Evolution ([Script]())</i></div>
+<div align="center"><i>Figure 14: AND Gate Decision Boundary Evolution ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/train_animation.py))</i></div>
 
 This shows us how the perceptron was able to approximate the linear function $f(w)$ representing our AND gate. Now this one example solution found by the perceptron, 
-as we saw in the loss landscape in Figure 7, there are a few other possible global optimal solutions, so I encourage you to play with the perceptron parameters in the training [script]().
+as we saw in the loss landscape in Figure 7, there are a few other possible global optimal solutions, so I encourage you to play with the perceptron parameters in the training [script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/train.py).
 
 ### What's Next?
 ---
@@ -330,7 +330,7 @@ Our perceptron was able to easily learn to emulate an AND gate, but what about a
 Plotting the possible input values and their corresponding activations, we get the following:
 
 <Plot htmlPath="/html/partOne/xor.html" />
-<div align="center"><i>Figure 16: Hypothesised XOR Gate Decision Boundary </i></div>
+<div align="center"><i>Figure 16: Hypothesised XOR Gate Decision Boundary ([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/xor.py))</i></div>
 
 Here we see that we can not separate the points with a straight line, but rather with a non-linear hyperplane. We can also only do this separation it seems like we need to do this in a third dimension. 
 To find this hyperplane we will need a more complex transformation, as we can not linearly separate the points. 
