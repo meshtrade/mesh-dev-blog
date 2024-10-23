@@ -16,6 +16,9 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
+			body {
+				overflow-x: hidden;
+			}
 			main {
 				width: calc(100% - 2em);
 				max-width: 100vw;
