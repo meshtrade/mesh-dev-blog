@@ -7,6 +7,7 @@ import { getCollection } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
 import { Image } from 'astro:assets';
 import Star from '../components/Star.astro';
+import Underline from '../components/Underline.astro';
 
 const posts = (await getCollection('blog')).sort(
 	(a: any, b: any) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -82,6 +83,16 @@ const posts = (await getCollection('blog')).sort(
 				background-image: url("/body-bg.svg");
 				background-repeat: repeat;
 			}
+			.hero-text-container {
+				position: relative;
+			}
+			.underline-container {
+				position: absolute;
+				top: -70px;
+				left: 30%;
+				-webkit-transform: translateX(-30%);
+				transform: translateX(-30%);
+			}
 			ul li a:hover h4,
 			ul li a:hover .date {
 				background: #C500CF;
@@ -102,6 +113,9 @@ const posts = (await getCollection('blog')).sort(
 				padding: 0.5em 3em;
 				font-size: medium;
 			}	
+			.post-thumbnail {
+				cursor: none;
+			}
 			.post-thumbnail img {
 				position: relative;
 				overflow: hidden;
@@ -116,7 +130,7 @@ const posts = (await getCollection('blog')).sort(
   				transition: transform .25s, filter .25s ease-in;
 			}
 			.img-wrapper img:hover {
-				transform: scale(1.02);
+				transform: scale(1.01);
 			}
 
 			@media (max-width: 720px) {
@@ -149,19 +163,24 @@ const posts = (await getCollection('blog')).sort(
 	</head>
 	<body>
 		<div class="background"/>
-		  <Star />
+		<Star />
 		  
 		<Header />
 		<main transition:animate="slide">
 			<section>
-				<h1 transition:name="hero title" class="page-title">Engineering Blog</h1>
-				<p transition:name="hero description" class="page-description">
-					At <span class="mesh-text">Mesh.Trade</span>, our engineering culture is driven by a passion for innovation and simplicity. 
-					We believe capital markets should be <span class="mesh-text">accessible</span>, <span class="mesh-text">transparent</span>, and <span class="mesh-text">efficient</span>. 
-					By leveraging cutting-edge technology, we&apos;ve engineered a platform that removes traditional barriers, 
-					simplifies complex processes, and reduces fees, making financial markets easier for everyone to access and use. Here we would
-					like to document some of our engineering challenges and insights.
-				</p>
+				<div class="hero-text-container">
+					<h1 transition:name="hero title" class="page-title">Engineering Blog</h1>
+					<div class="underline-container">
+						<Underline />
+					</div>
+					<p transition:name="hero description" class="page-description">
+						At <span class="mesh-text">Mesh.Trade</span>, our engineering culture is driven by a passion for innovation and simplicity. 
+						We believe capital markets should be <span class="mesh-text">accessible</span>, <span class="mesh-text">transparent</span>, and <span class="mesh-text">efficient</span>. 
+						By leveraging cutting-edge technology, we&apos;ve engineered a platform that removes traditional barriers, 
+						simplifies complex processes, and reduces fees, making financial markets easier for everyone to access and use. Here we would
+						like to document some of our engineering challenges and insights.
+					</p>
+				</div>
 				<ul>
 					{
 						posts.map((post) => (

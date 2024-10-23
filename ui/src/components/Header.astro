@@ -6,6 +6,14 @@ import Logo from "./Logo.astro";
 <header>
 	<nav>
 		<HeaderLink title="Mesh.Dev"/>
+		<ul>
+			<li>
+				<a href="https://mesh.trade/" target="_new">What We Do</a>
+			</li>
+			<li>
+				<a href="https://www.mesh.trade/careers/" target="_new">Careers</a>
+			</li>
+		</ul>
 	</nav>
 	<link
     rel="stylesheet"
@@ -15,22 +23,59 @@ import Logo from "./Logo.astro";
 />
 </header>
 <style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		margin: 1em 0;
-		display: flex;
-		align-items: center;
-	}
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: 1260px;
+		width: 100%;
+		max-width: 1440px;
+		margin: 0 auto;
 	}
+	nav ul {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-right: 1em;
+	}
+	nav ul li a{
+		display: flex;
+		align-items: center;
+	}
+	nav ul a {
+		font-size: large;
+		position: relative;
+		white-space: nowrap;
+		color: black;
+	}
+	nav ul li:first-of-type {
+		margin-right: 1em;
+	}
+	nav ul a::before,
+	nav ul a::after {
+		position: absolute;
+		content: "";
+		width: 0%;
+		height: 2px;
+		background: #C500CF;
+		background: linear-gradient(to right, #C500CF 0%, #DC0451 100%);
+		top: 100%;
+		right: 0;
+		pointer-events: none;
+    	transition: width 0.3s;
+	}
+
+	nav ul a:hover::before {
+		width: 100%;
+	}
+
 	@media (max-width: 720px) {
 		header {
 			padding: 0;
+			margin: 1em 0;
+		}
+		nav ul a {
+			display: none;
 		}
 	}
 </style>

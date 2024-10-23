@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import { Image } from 'astro:assets';
+import SquiggleUnderline from '../components/SquiggleUnderline.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -19,6 +20,16 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 				width: calc(100% - 2em);
 				max-width: 100%;
 				margin: 0;
+			}
+			.title-text-container {
+				position: relative;	
+			}
+			.underline {
+				top: -10%;
+				left: 50%;
+				-webkit-transform: translateX(-50%);
+				transform: translateX(-50%);
+				position: absolute;
 			}
 			.hero-image {
 				width: 100%;
@@ -78,6 +89,20 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 				transform-origin: 0% 50%;
 				transform: scale3d(1, 1, 1);
 			}
+			@media (max-width: 720px) {
+				article {
+					width: 100%;
+				}
+				.prose {
+					width: 100%;
+				}
+				.scroll-container {
+					opacity: 0;
+				}
+				.scroll {
+					opacity: 0;
+				}
+			}
 		</style>
 	</head>
 
@@ -100,7 +125,12 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 								)
 							}
 						</div>
-						<h1>{title}</h1>
+						<div class="title-text-container">
+							<h1>{title}</h1>
+							<div class="underline">
+								<SquiggleUnderline />
+							</div>
+						</div>
 						<div class="author">
 							Author: <span class="mesh-text">{author}</span>
 						</div>
@@ -114,8 +144,8 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 	</body>
 	<script define:vars={{title}}>
 		const scroll = document.getElementById(title) ?? new HTMLElement();
-
-		window.onscroll = () => {
+	 	const addScrollElement = () => {
+			window.onscroll = () => {
 			if (document.documentElement.scrollTop <= 500) {
 				scroll.style.display = "none";
 				return;
@@ -123,11 +153,22 @@ const { title, description, pubDate, updatedDate, heroImage, author } = Astro.pr
 			scroll.style.display = "block";
 		};
 
-		scroll?.addEventListener("click", e => {
-			document.documentElement.scrollTo({
-				behavior: "smooth",
-				top: 0,
+			scroll?.addEventListener("click", e => {
+				document.documentElement.scrollTo({
+					behavior: "smooth",
+					top: 0,
+				});
 			});
-		});
+		};
+		
+		if (window.innerWidth <= 720) {
+			return;
+		}
+
+		addScrollElement();
+		window.onresize(() => {
+			addScrollElement();
+		})
+
 	</script>
 </html>
