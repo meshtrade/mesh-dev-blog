@@ -19,6 +19,9 @@ const posts = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
+			body {
+				overflow-x: hidden;
+			}
 			main {
 				width: 960px;
 			}
