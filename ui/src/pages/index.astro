@@ -19,9 +19,6 @@ const posts = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			body {
-				overflow-x: hidden;
-			}
 			main {
 				width: 960px;
 			}
@@ -127,16 +124,20 @@ const posts = (await getCollection('blog')).sort(
 			.img-wrapper {
 				overflow: hidden;
 				border-radius: 12px;	
+				padding: 3px;
 			}
 			.img-wrapper img {
 				transform-origin: 65% 75%;
-  				transition: transform .25s, filter .25s ease-in;
+				cursor: pointer;
 			}
 			.img-wrapper img:hover {
 				transform: scale(1.01);
 			}
 
 			@media (max-width: 720px) {
+				.img-wrapper {
+					padding: 0px;
+				}
 				.page-title {
 					font-size: xx-large;
 				}
@@ -172,7 +173,9 @@ const posts = (await getCollection('blog')).sort(
 		<main transition:animate="slide">
 			<section>
 				<div class="hero-text-container">
-					<h1 transition:name="hero title" class="page-title">Engineering Blog</h1>
+					<h1 class="page-title">
+						Engineering Blog
+					</h1>
 					<div class="underline-container">
 						<Underline />
 					</div>
@@ -186,7 +189,7 @@ const posts = (await getCollection('blog')).sort(
 				</div>
 				<ul>
 					{
-						posts.map((post) => (
+						posts.map((post: any) => (
 							<li class="post-thumbnail">
 								<a href={`/blog/${post.slug}/`}>
 									<div class="img-wrapper">

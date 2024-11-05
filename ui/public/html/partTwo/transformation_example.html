@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animated Linear Transformation Grid</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow-y: hidden;
+        }
+        #visualisation {
+            width: 100%;
+            height: 100%;
+        }
+        .control-panel {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .translation-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="number"] {
+            width: 60px;
+        }
+        .tooltip {
+            position: absolute;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .grid-point {
+            cursor: pointer;
+        }
+        label {
+            font-weight: bold;
+        }
+        span {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <label>Transformation Matrix:</label>
+        <input type="text" id="matrix-input" value="[[-3.4, 3.4], [-3.4, 3.8]]" />
+        <div class="translation-inputs">
+            <label>Bias 1:</label>
+            <input type="number" id="translate-x" value="0" step="0.5" />
+            <label>Bias 2:</label>
+            <input type="number" id="translate-y" value="0" step="0.5" />
+        </div>
+        <button onclick="applyTransformation()">Transform</button>
+        <button onclick="resetGrid()">Reset</button>
+        <span>Hover on point to see input values</span>
+    </div>
+    <svg id="visualization" width="600" height="600"></svg>
+
+    <script>
+        // Visualization parameters
+        const width = 600;
+        const height = 550;
+        const gridSize = 20;  // Number of grid lines
+        const duration = 1500;  // Animation duration in ms
+
+        // Setup SVG
+        const svg = d3.select("#visualization");
+        
+        // Create tooltip div
+        const tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip");
+        
+        // Create scales
+        const xScale = d3.scaleLinear()
+            .domain([-4, 4])
+            .range([0, width]);
+        
+        const yScale = d3.scaleLinear()
+            .domain([-4, 4])
+            .range([height, 0]);
+
+        // Store original and current grid points
+        let originalGridPoints = [];
+        let currentGridPoints = [];
+
+        // Store point mappings
+        let pointMappings = new Map();
+
+        // Sigmoid function: f(x) = 1 / 1 + e^-x
+        const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+
+        // Generate grid points
+        function generateGrid(size) {
+            return [
+                [0,0],
+                [1,0],
+                [0,1],
+                [1,1]  
+            ];
+        }
+
+        // Apply linear transformation
+        function transformPoint(point, matrix) {
+            return [
+                matrix[0][0] * point[0] + matrix[0][1] * point[1],
+                matrix[1][0] * point[0] + matrix[1][1] * point[1]
+            ];
+        }
+
+        // Apply bias translation
+        function applyBias(point, bias) {
+            return [
+                point[0] + bias[0],
+                point[1] + bias[1]
+            ]; 
+        }
+
+        // apply sigmoid activation function to given point
+        function applyActivation(point) {
+            return [
+                sigmoid(point[0]),
+                sigmoid(point[1])
+            ]
+        }
+
+        // Format coordinates for tooltip
+        function formatCoordinates(currentPoint, originalPoint) {
+            return `(${originalPoint[0]}, ${originalPoint[1]})`;
+        }
+
+        // Initial grid visualization
+        function visualizeGrid() {
+            originalGridPoints = generateGrid(gridSize);
+            currentGridPoints = [...originalGridPoints];
+
+            // Initialize point mappings
+            pointMappings = new Map(
+                originalGridPoints.map(point => [point, [...point]])
+            );
+
+            // Remove existing grid
+            svg.selectAll(".grid-point").remove();
+
+            // Draw grid points
+            svg.selectAll(".grid-point")
+                .data(originalGridPoints)
+                .enter()
+                .append("circle")
+                .attr("class", "grid-point")
+                .attr("cx", d => xScale(d[0]))
+                .attr("cy", d => yScale(d[1]))
+                .attr("r", 8)
+                .attr("fill", "blue")
+                .on("mouseover", function(event, d) {
+                    const currentPoint = pointMappings.get(d);
+                    tooltip.style("opacity", 1)
+                        .html(formatCoordinates(currentPoint, d))
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                    d3.select(this)
+                        .attr("r", 10);
+                })
+                .on("mousemove", function(event) {
+                    tooltip.style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.style("opacity", 0);
+                    d3.select(this)
+                        .attr("r", 8);
+                });
+
+            // X-axis
+            svg.append("line")
+                .attr("class", "axis")
+                .attr("x1", 0)
+                .attr("y1", yScale(0))
+                .attr("x2", width)
+                .attr("y2", yScale(0))
+                .attr("stroke", "#ccc")
+                .attr("stroke-width", 1);
+
+            // Y-axis
+            svg.append("line")
+                .attr("class", "axis")
+                .attr("x1", xScale(0))
+                .attr("y1", 0)
+                .attr("x2", xScale(0))
+                .attr("y2", height)
+                .attr("stroke", "#ccc")
+                .attr("stroke-width", 1);
+        }
+
+        // Animate transformation
+        function applyTransformation() {
+            const matrixInput = document.getElementById("matrix-input").value;
+            const translateX = parseFloat(document.getElementById("translate-x").value) || 0;
+            const translateY = parseFloat(document.getElementById("translate-y").value) || 0;
+
+            try {
+                const matrix = JSON.parse(matrixInput);
+                const translation = [translateX, translateY];
+
+                // Transform points
+                currentGridPoints = originalGridPoints.map(point => 
+                    transformPoint(point, matrix)
+                );
+
+                // Update mappings for transformed points
+                originalGridPoints.forEach((originalPoint, i) => {
+                    pointMappings.set(originalPoint, currentGridPoints[i]);
+                });
+
+                // Animate transformation
+                svg.selectAll(".grid-point")
+                    .data(originalGridPoints)
+                    .transition()
+                    .duration(duration * 2)
+                    .attr("cx", d => xScale(pointMappings.get(d)[0]))
+                    .attr("cy", d => yScale(pointMappings.get(d)[1]))
+                    .attr("fill", "red");
+
+                // Apply bias
+                currentGridPoints = currentGridPoints.map(point => 
+                    applyBias(point, translation)
+                );
+
+                // Update mappings for bias
+                originalGridPoints.forEach((originalPoint, i) => {
+                    pointMappings.set(originalPoint, currentGridPoints[i]);
+                });
+
+                // Animate bias translation
+                svg.selectAll(".grid-point")
+                    .data(originalGridPoints)
+                    .transition()
+                    .duration(duration)
+                    .delay(8000)
+                    .attr("cx", d => xScale(pointMappings.get(d)[0]))
+                    .attr("cy", d => yScale(pointMappings.get(d)[1]))
+                    .attr("fill", "red");
+
+                // Apply activation
+                currentGridPoints = currentGridPoints.map(point => 
+                    applyActivation(point)
+                ); 
+
+                // Update mappings for activation
+                originalGridPoints.forEach((originalPoint, i) => {
+                    pointMappings.set(originalPoint, currentGridPoints[i]);
+                });
+
+                // Animate activation function
+                svg.selectAll(".grid-point")
+                    .data(originalGridPoints)
+                    .transition()
+                    .duration(duration)
+                    .delay(5000)
+                    .attr("cx", d => xScale(pointMappings.get(d)[0]))
+                    .attr("cy", d => yScale(pointMappings.get(d)[1]))
+                    .attr("fill", "red");
+
+            } catch (error) {
+                alert("Invalid matrix format. Use format: [[a, b], [c, d]]");
+            }
+        }
+
+        // Reset grid to original state
+        function resetGrid() {
+            // Reset point mappings
+            originalGridPoints.forEach(point => {
+                pointMappings.set(point, [...point]);
+            });
+
+            svg.selectAll(".grid-point")
+                .data(originalGridPoints)
+                .transition()
+                .duration(duration)
+                .attr("cx", d => xScale(d[0]))
+                .attr("cy", d => yScale(d[1]))
+                .attr("fill", "blue");
+
+            // Reset current grid points
+            currentGridPoints = [...originalGridPoints];
+        }
+
+        // Initial setup
+        visualizeGrid();
+    </script>
+</body>
+</html>

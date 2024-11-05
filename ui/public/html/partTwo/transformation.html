@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animated Linear Transformation Grid</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow-y: hidden;
+        }
+        #visualisation {
+            width: 100%;
+            height: 100%;
+        }
+        .control-panel {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <label>Transformation Matrix:</label>
+        <input type="text" id="matrix-input" value="[[0, 1], [1, 0]]" />
+        <button onclick="applyTransformation()">Transform</button>
+        <button onclick="resetGrid()">Reset</button>
+    </div>
+    <svg id="visualization" width="600" height="600"></svg>
+
+    <script>
+        // Visualization parameters
+        const width = 600;
+        const height = 550;
+        const gridSize = 20;  // Number of grid lines
+        const duration = 1500;  // Animation duration in ms
+
+        // Setup SVG
+        const svg = d3.select("#visualization");
+        
+        // Create scales
+        const xScale = d3.scaleLinear()
+            .domain([-5, 5])
+            .range([0, width]);
+        
+        const yScale = d3.scaleLinear()
+            .domain([-5, 5])
+            .range([height, 0]);
+
+        // Store original and current grid points
+        let originalGridPoints = [];
+        let currentGridPoints = [];
+
+        // Generate grid points
+        function generateGrid(size) {
+            const points = [];
+            for (let x = -size/2; x <= size/2; x++) {
+                for (let y = -size/2; y <= size/2; y++) {
+                    points.push([x, y]);
+                }
+            }
+            return points;
+        }
+
+        // Apply linear transformation
+        function transformPoint(point, matrix) {
+            return [
+                matrix[0][0] * point[0] + matrix[0][1] * point[1],
+                matrix[1][0] * point[0] + matrix[1][1] * point[1]
+            ];
+        }
+
+        // Initial grid visualization
+        function visualizeGrid() {
+            originalGridPoints = generateGrid(gridSize);
+            currentGridPoints = [...originalGridPoints];
+
+            // Remove existing grid
+            svg.selectAll(".grid-point").remove();
+
+            // Draw grid points
+            svg.selectAll(".grid-point")
+                .data(originalGridPoints)
+                .enter()
+                .append("circle")
+                .attr("class", "grid-point")
+                .attr("cx", d => xScale(d[0]))
+                .attr("cy", d => yScale(d[1]))
+                .attr("r", 3)
+                .attr("fill", "blue");
+        }
+
+        // Animate transformation
+        function applyTransformation() {
+            const matrixInput = document.getElementById("matrix-input").value;
+            try {
+                const matrix = JSON.parse(matrixInput);
+
+                // Transform points
+                currentGridPoints = originalGridPoints.map(point => 
+                    transformPoint(point, matrix)
+                );
+
+                // Animate transformation
+                svg.selectAll(".grid-point")
+                    .data(currentGridPoints)
+                    .transition()
+                    .duration(duration)
+                    .attr("cx", d => xScale(d[0]))
+                    .attr("cy", d => yScale(d[1]))
+                    .attr("fill", "red");
+
+            } catch (error) {
+                alert("Invalid matrix format. Use format: [[a, b], [c, d]]");
+            }
+        }
+
+        // Reset grid to original state
+        function resetGrid() {
+            svg.selectAll(".grid-point")
+                .data(originalGridPoints)
+                .transition()
+                .duration(duration)
+                .attr("cx", d => xScale(d[0]))
+                .attr("cy", d => yScale(d[1]))
+                .attr("fill", "blue");
+
+            // Reset current grid points
+            currentGridPoints = [...originalGridPoints];
+        }
+
+        // Initial setup
+        visualizeGrid();
+    </script>
+</body>
+</html>

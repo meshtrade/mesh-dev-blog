@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Loss Landscape with Gradient Arrow and Legend</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    svg {
+      border: 1px solid #ccc;
+      background: radial-gradient(circle, #7fc7ff, #1e528e);
+    }
+  </style>
+</head>
+<body>
+
+<svg id="loss-landscape" width="600" height="600"></svg>
+
+<script>
+  const svg = d3.select("#loss-landscape");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+
+  // Define the loss function (parabola-like landscape)
+  function lossFunction(x, y) {
+    return (x - width / 2) ** 2 + (y - height / 2) ** 2;
+  }
+
+  // Compute the gradient of the loss function
+  function gradient(x, y) {
+    return [2 * (x - width / 2), 2 * (y - height / 2)];
+  }
+
+  // Generate a color scale based on the loss value
+  const maxLoss = lossFunction(0, 0) * 2;
+  const colorScale = d3.scaleSequential(d3.interpolateViridis)
+                       .domain([0, maxLoss]);
+
+  // Create a 2D landscape with a gradient
+  const gridSize = 20;
+  for (let x = 0; x < width; x += gridSize) {
+    for (let y = 0; y < height; y += gridSize) {
+      const z = lossFunction(x, y);
+      svg.append("rect")
+         .attr("x", x)
+         .attr("y", y)
+         .attr("width", gridSize)
+         .attr("height", gridSize)
+         .attr("fill", colorScale(z));
+    }
+  }
+
+  // Define the arrow marker
+  svg.append("defs").append("marker")
+    .attr("id", "arrow")
+    .attr("viewBox", "0 0 10 10")
+    .attr("refX", 5)
+    .attr("refY", 5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto-start-reverse")
+    .append("path")
+    .attr("d", "M 0 0 L 10 5 L 0 10 z")
+    .attr("fill", "red");
+
+  // Append the arrow line
+  const arrow = svg.append("line")
+                   .attr("stroke", "red")
+                   .attr("stroke-width", 2)
+                   .attr("marker-end", "url(#arrow)");
+
+  // Update the arrow to follow the gradient direction
+  svg.on("mousemove", function(event) {
+    const [mouseX, mouseY] = d3.pointer(event);
+
+    // Calculate the gradient direction at the mouse position
+    const [gradX, gradY] = gradient(mouseX, mouseY);
+    const length = Math.sqrt(gradX * gradX + gradY * gradY);
+    const scale = 20 / length; // Adjust arrow length
+
+    // Set arrow to point in the direction of greatest increase (gradient)
+    arrow.attr("x1", mouseX)
+         .attr("y1", mouseY)
+         .attr("x2", mouseX + gradX * scale)
+         .attr("y2", mouseY + gradY * scale);
+  });
+
+  // Create a color legend
+  const legendWidth = 20;
+  const legendHeight = 200;
+  const legendX = width - 70;
+  const legendY = 30;
+
+  const legendScale = d3.scaleLinear()
+                        .domain([0, maxLoss])
+                        .range([legendHeight, 0]);
+
+  const legendAxis = d3.axisRight(legendScale)
+                       .ticks(5);
+
+  const legend = svg.append("g")
+                    .attr("transform", `translate(${legendX},${legendY})`);
+
+  // Append color gradient to legend
+  const gradientDef = svg.append("defs")
+                         .append("linearGradient")
+                         .attr("id", "legend-gradient")
+                         .attr("x1", "0%")
+                         .attr("y1", "100%")
+                         .attr("x2", "0%")
+                         .attr("y2", "0%");
+
+  gradientDef.append("stop")
+             .attr("offset", "0%")
+             .attr("stop-color", d3.interpolateViridis(0));
+
+  gradientDef.append("stop")
+             .attr("offset", "100%")
+             .attr("stop-color", d3.interpolateViridis(1));
+
+  legend.append("rect")
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)");
+
+  // Add axis for legend
+  legend.call(legendAxis);
+
+  // Legend label
+  legend.append("text")
+        .attr("x", -30)
+        .attr("y", -10)
+        .attr("fill", "black")
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Loss Value");
+
+</script>
+
+</body>
+</html>

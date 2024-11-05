@@ -122,7 +122,7 @@ a step function and is useful in our case for clamping the weighted sum to corre
 Now how do we get the perceptron to actually emulate an AND gate? Well we need to train it.
 To train our *perceptron* to correctly predict the output of an AND gate, we need to train it on some examples. 
 The possible inputs of the AND gate will be the examples which we will train our *perceptron* on(referred to as training data from here on). 
-As said by author John Bradsaw "mistakes are our teachers", the perceptron has no perception of what an AND gate is, so we need to instill this knowledge into the model using trial-and-error algorithm. 
+As said by author John Bradsaw "mistakes are our teachers", the perceptron has no perception of what an AND gate is, so we need to instill this knowledge into the model using a trial-and-error algorithm. 
 
 Since we know what the output of an AND gate should be, we can label the inputs of the training data and 'help' the perceptron when it incorrectly predicts the output for a given set of data points. 
 We do this by calculating the difference between the output of the perceptron and the actual expected output. 

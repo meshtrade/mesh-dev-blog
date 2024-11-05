@@ -1,4 +1,4 @@
-<section>
+<section class="star-section">
     <span class="star"></span>
     <span class="star"></span>
     <span class="star"></span>
@@ -6,6 +6,10 @@
     <span class="star"></span>
 </section>
 <style>
+    .star-section {
+        max-width: 100%;
+        position: relative;
+    }
     .star{
         position: absolute;
         top: -50px;
@@ -13,7 +17,7 @@
         background: gray;
         border-radius: 50%;
         box-shadow: 0 0 0 4px rgba(255,255,255,0.1),0 0 0 8px rgba(255,255,255,0.1),0 0 20px rgba(255, 0, 0, 0.1);
-        animation: animate 6s linear 1.2s infinite;
+        animation: animate 6s linear 1.5s infinite;
     }
     .star::before{
         content:'';
@@ -45,7 +49,7 @@
     top: -30px;
     right: max(500px, 50%);
     left: initial;
-    animation-delay: 1.2s;
+    animation-delay: 1.5s;
     animation-duration: 6s;
 }
 .star:nth-child(1)::before {
