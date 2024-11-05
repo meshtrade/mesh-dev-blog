@@ -1,7 +1,7 @@
 import plotly.graph_objs as go
 import numpy as np
 
-# Define the points
+# Define the points representing XOR gate inputs and outputs
 points = np.array([[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]])
 
 # Create a scatter plot of the points

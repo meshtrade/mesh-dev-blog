@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
 
-# XOR gate inputs (possible combinations of binary inputs)
+# XOR gate inputs 
 points = [
     [0, 0],
     [0, 1],

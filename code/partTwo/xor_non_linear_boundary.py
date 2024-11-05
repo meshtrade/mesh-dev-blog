@@ -10,7 +10,7 @@ colors = ['blue' if label == 0 else 'red' for label in labels]
 
 # Generate points for a standard parabola
 x_vals = np.linspace(-5, 5, 100)
-y_vals = 7 * (x_vals - 0.8)**2 - 1 # Standard parabolic curve y = ax^2 with a = 1.5
+y_vals = 7 * (x_vals - 0.8)**2 - 1 
 
 # Rotate the parabola by 45 degrees
 theta = np.radians(45)  # Rotation angle in radians

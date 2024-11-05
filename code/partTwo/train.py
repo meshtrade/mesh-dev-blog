@@ -13,8 +13,8 @@ class XORNet(nn.Module):
         super(XORNet, self).__init__()
         self.layer1 = nn.Linear(2, 2)
         self.layer2 = nn.Linear(2, 1)
-        self.activation = nn.Mish()
-        self.sigmoid = nn.Mish()
+        self.activation = nn.Mish() # Adjust activation function here
+        self.sigmoid = nn.Mish() # Adjust activation function here
     
     def forward(self, x):
         x = self.activation(self.layer1(x))
@@ -24,7 +24,7 @@ class XORNet(nn.Module):
 # Initialize the model, loss function, and optimizer
 model = XORNet()
 criterion = nn.MSELoss()  
-optimizer = optim.SGD(model.parameters(), lr=0.1)
+optimizer = optim.SGD(model.parameters(), lr=0.1) # Learning Rate
 
 # Training loop
 epochs = 40000
