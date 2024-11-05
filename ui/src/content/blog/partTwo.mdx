@@ -29,7 +29,7 @@ Consider the XOR gate, famous for being the exact counter-example for highlighti
 Conceptually an XOR gate is used to represent an exclusive or logic operation, which means it will only energize when one of the inputs is $1$, but not both. At a surface level it might not seem impossible for a perceptron to be able to predict the outputs of an XOR gate. If the perceptron was able to predict the outputs of an AND gate, what prevents it from predicting the output of an XOR gate? Let's plot a possible decision boundary to see why this is not possible to with a single perceptron.
 
 <Plot htmlPath="/html/partTwo/xor_non_linear.html"/>
-<div align="center"><i>Figure 2: XOR Gate With Non-Linear Decision Boundary</i></div>
+<div align="center"><i>Figure 2: XOR Gate With Non-Linear Decision Boundary([Script](https://github.com/meshtrade/mesh-dev-blog/tree/master/code/partTwo/xor_non_linear_boundary.py))</i></div>
 
 From our plot we see that it is not really possible to divide the points using a single line, this tells us the problem is not linearly separable. 
 Instead, we need a parabola to separate the points. In the context of AI non-linearity refers to anything that is not a line, so this parabola is a non-linear decision boundary.
@@ -38,7 +38,7 @@ the curved decision boundary for the XOR gate might seem like an impossible feat
 Hope is not lost however, we just need to look at the problem from a different perspective, consider the following set of decision boundaries:
 
 <Plot htmlPath="/html/partTwo/xor_boundary.html"/>
-<div align="center"><i>Figure 3: XOR Gate With Linear Decision Boundaries</i></div>
+<div align="center"><i>Figure 3: XOR Gate With Linear Decision Boundaries([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/xor_boundary.py))</i></div>
 
 We see here that it is possible to separate the points using two lines, since we know a single perceptron can learn a single linear decision boundary the natural conclusion is that we can learn two decision boundaries using two perceptrons. 
 That solves part of the problem, but it is not clear how these perceptrons would work together to solve the problem of predicting the output of the XOR gate. 
@@ -55,7 +55,7 @@ might end up learning the same decision boundary if the weights are initialised 
 To solve this problem we first need to define what the two decision boundaries would aim to classify.
 
 <Plot htmlPath="/html/partTwo/separate_decision_boundaries.html"/>
-<div align="center"><i>Figure 5: XOR Gate Possible Decision Boundaries</i></div>
+<div align="center"><i>Figure 5: XOR Gate Possible Decision Boundaries([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/separate_decision_boundaries.py))</i></div>
 
 A possible strategy here would be that each decision boundary should be able to learn when given the inputs $(0,0)$ and $(1,1)$ the output should be $0$. We know that the perceptron will only be able to classify whether an input is below or above the line. 
 Considering the plot on the left-handside, it groups $\{(1,1), (0,1), (1,0)\}$ which we could train it to classify as $1$ and the input $(1,1)$ would falsely be correctly be predicted as $1$. This boundary does however classify the input $(0,0)$ correctly. The plot on the right groups the points $\{(0,0), (0,1), (1,0)\}$ together, but not $(1,1)$. Giving us a false positive for the input $(1,1)$.
@@ -83,7 +83,7 @@ a single input value, the computation it performs given an input value $x$ is ex
 Experiment with the sliders to see if you can get the loss to reach $0$.
 
 <Plot htmlPath="/html/partTwo/linear_loss.html" />
-<div align="center"><i>Figure 8: Decision Boundary Training Visualisation</i></div>
+<div align="center"><i>Figure 8: Decision Boundary Training Visualisation([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/linear_loss.html))</i></div>
 
 In the exercise above you probably used the line as an indicator, which makes the problem pretty simple. For a second challenge try and only use the loss value as the guide and see what you can achieve. This should a bit more challenging, but not impossible. The strategy to solving this problem (not looking at the target line) would be to keep an eye on the loss value.
 If the loss increases based on the weight or bias change the logical step would be to move it in the *opposite direction*. After some tweaking you should be able to achieve a loss value of $0$. What this exercise shows us is that perceptrons are trained by adjusting some set of parameters with respect to the loss value. Also, you might have also realised that as the error became smaller you also would've made smaller updates to the weight and biases. This fact also shows us that the magnitude by which the parameters are updated has a direct relationship with the magnitude of the error.  
@@ -156,7 +156,7 @@ One thing I've failed to mention is why this rate of change is useful in informi
 To understand what a gradient is, let's quickly gain an intuition for what a derivative actually is. Practically the derivative is described as the *instantaneous rate of change* at a point. Consider the following visualisation (move cursor along curve):
 
 <Plot htmlPath="/html/partTwo/derivative.html"/>
-<div align="center"><i>Figure 9: Derivative Visualisation</i></div>
+<div align="center"><i>Figure 9: Derivative Visualisation([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/derivative.html))</i></div>
 
 The derivative $\frac{dy}{dx}$ of the above parabola $y = x^2$ is a line. The *slope* of the line describes the value of the derivative at that point. The point at which the derivative $\frac{dy}{dx} = 0$ is when there is no *change* or the slope of the tangent line is $0$. To understand why this is useful, imagine this parabola represents all the possible loss values for a perceptron with a single weight and no bias. This means the value of x-axis is the value of the weight and the y-axis is the value of the loss. Since we want to minimise this error value, it would be useful to know at which point the loss value is $0$. The derivative is a useful tool in determining this point. So the problem of minimising the loss value can also be thought of as minimising the derivative value of the loss function with respect to a parameter of a perceptron or neural network. Now this only looks at a single parameter, if we add another parameter we end up with a loss landscape as shown in the first article. However we mentioned that a derivative represents the rate of change for a single variable, so how does the calculation work for multiple parameters? Well the partial derivative *partially* :) solves the issue. Consider some generic loss function $\gamma$ for a neural network with $m$ weights and some number of biases. For the sake of argument we'll only be looking at the weights, but the principle is the same for the biases. Calculating the partial derivatives for the loss function $\gamma$ with regard to the weights would result in the following:
 
@@ -169,7 +169,7 @@ the slope of $\gamma$, i.e. the gradient points in the direction of the greatest
 fact consider a simple example loss landscape for a single perceptron with two weight values:
 
 <Plot htmlPath="/html/partTwo/gradient_loss.html"/>
-<div align="center"><i>Figure 10: Example 3D Loss Landscape</i></div>
+<div align="center"><i>Figure 10: Example 3D Loss Landscape([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/gradient.py))</i></div>
 
 For this bowl-like loss function its gradient would be given by:
 
@@ -186,12 +186,12 @@ The gradient is more formally expressed as:
 Now to visualise the value of the gradient $\nabla \gamma$, we can derive a contour plot from the loss landscape. Imagine the contour plot as squashing the loss landscape to 2 dimensional plane. The gradient can be visualised as an arrow that will always reliably point in the direction of the greatest increase. In the plot below the darker the values get the lower the value of the loss function. If you hover on any point on the plot you will see that the gradient will always point in the direction of the steepest increase. 
 
 <Plot htmlPath="/html/partTwo/gradient.html"/>
-<div align="center"><i>Figure 11: Contour Plot Of 3D Loss Landscape With Steepest Ascent Gradient</i></div>
+<div align="center"><i>Figure 11.1: Contour Plot Of 3D Loss Landscape With Steepest Ascent Gradient([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/gradient.html))</i></div>
 
 By simply negating the value of the gradient we can get the gradient to point in the direction of the *steepest descent*.
 
 <Plot htmlPath="/html/partTwo/gradient_negative.html"/>
-<div align="center"><i>Figure 11: Contour Plot Of 3D Loss Landscape With Steepest Descent Gradient</i></div>
+<div align="center"><i>Figure 11.2: Contour Plot Of 3D Loss Landscape With Steepest Descent Gradient([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/gradient_loss.html))</i></div>
 
 So with this useful construct in hand let's revist the problem of optimising a neural network. The goal with training a neural network is to instill knowledge.
 The parameters of the neural network are responsible for capturing and holding the knowledge of the neural network. One of the ways of training the network
@@ -312,7 +312,7 @@ $\begin{pmatrix}
 For the visualisation let every point represent a vector or more specifically the end of a vector (the point it points to). Click transform to see how the matrix moves the different vectors (play around with different matrix values to see some other cool transformations). 
 
 <Plot htmlPath="/html/partTwo/transformation.html"/>
-<div align="center"><i>Figure 13: Transformation Matrix Visualisation</i></div>
+<div align="center"><i>Figure 13: Transformation Matrix Visualisation([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/transformation.html))</i></div>
 
 The transformation the matrix applies is formally known as a *linear transformation*. The above example shows a rotation transformation, the main takeaway here is that
 the vector-matrix can move vectors around in some abstract space. The next step after multiplying the vector with the matrix representing the neural network weights is adding
@@ -320,14 +320,14 @@ the bias vector. Recall that a bias is able to change the intercept point for th
 translate the vectors in either the $x$ and $y$ dimension (in this 2D example).
 
 <Plot htmlPath="/html/partTwo/transformation_bias.html"/>
-<div align="center"><i>Figure 14: Transformation Matrix And Bias Translation Visualisation</i></div>
+<div align="center"><i>Figure 14: Transformation Matrix And Bias Translation Visualisation([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/transformation_bias.html))</i></div>
 
 The next operation is applying the activation function to each weighted sum in the resulting vector after multiplying the input vector with the weight matrix and adding the bias.
 So now we quickly also need to address why our step-function from the last article can not be used in a neural network. The reason is due to the nature of derivatives can only be 
 applied to *continuous* function. Recall that the step-function is $0$ for any value less than $0$ and $1$ for any positive number.
 
 <Plot htmlPath="/html/partTwo/activation_step.html"/>
-<div align="center"><i>Figure 15: Step Function Activation Function</i></div>
+<div align="center"><i>Figure 15: Step Function Activation Function([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partOne/activation.py))</i></div>
 
 At $0$ the 'instantenous' jump happens where $1$ is returned by the function, the derivative of the step-function does not exist at this point and so we can not adjust the weights when the weighted sum is $0$. There is some more complicated mathematical logic behind this fact, but for the sake of argument just know that we can not use this function when using the backpropogation algorithm for updating the parameters of a neural network. So instead we will be looking at a new activation function more formally known as a sigmoid function:
 
@@ -337,17 +337,17 @@ At $0$ the 'instantenous' jump happens where $1$ is returned by the function, th
 The sigmoid is a smoothed out step-function and is trivially differentiable since it is continuous over all inputs. We can visualise the magnitude of the derivative for the different inputs of the function using the visualisation below:
 
 <Plot htmlPath="/html/partTwo/derivative_sigmoid.html"/>
-<div align="center"><i>Figure 17: Sigmoid Derivative</i></div>
+<div align="center"><i>Figure 17: Sigmoid Derivative([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/derivative_sigmoid.html))</i></div>
 
 With this last puzzle piece we can fully visualise how the first layer of the neural network manipulates the inputs given to it:
 
 <Plot htmlPath="/html/partTwo/transformation_activation.html"/>
-<div align="center"><i>Figure 18: Neural Network Hidden Layer Transformation</i></div>
+<div align="center"><i>Figure 18: Neural Network Hidden Layer Transformation([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/transformation_activation.html))</i></div>
 
 In the above animation you can see how the translations are applied in a step-wise function. The usefulness of these transformations might not be immediately apparent, but let's think about this for a second. Remember that the output node of the neural network we built is only a single perceptron, which means it can only learn a single linear decision boundary. This means we need to find a way of transforming the inputs in such a way that the last output neuron can linearly separate the inputs fed into it. Preparing the input space is the responsibility of the hidden layer of the neural network. Let's see if we can find the weight values and bias values by hand for the hidden layer (as a hint I've already set a possible set of weights, play around with the bias values):
 
 <Plot htmlPath="/html/partTwo/transformation_example.html"/>
-<div align="center"><i>Figure 19: Neural Network Hidden Layer Transformation On XOR Inputs</i></div>
+<div align="center"><i>Figure 19: Neural Network Hidden Layer Transformation On XOR Inputs([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/ui/public/html/partTwo/transformation_example.html))</i></div>
 
 After playing with the bias values you should see that if the bias vector is $\langle 1.5, -2 \rangle$, we are actually able to linearly separate the points that output $1$ from those that output $0$. This means that the perceptron in the output layer learns how to separate the points after they have been transformed. Once again we
 have analysed that our perceptron has an appropriate architecture and can learn the XOR gate. So for completeness let's define the algorithm for training this neural network.
@@ -375,43 +375,43 @@ Updating the weights and biases is known as *back propagation* (steps 4-5). Thes
 the two phases of training a neural network. Below we show the loss graph for one of the runs of training a neural network. It was trained over $40,000$ epochs and a learning rate of $0.1$.
 
 <Plot htmlPath="/html/partTwo/loss_run.html"/>
-<div align="center"><i>Figure 20: Example Run Of Algorithm - Showing Loss Over Epochs</i></div>
+<div align="center"><i>Figure 20: Example Run Of Algorithm - Showing Loss Over Epochs([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 We don't get a final loss value of exactly $0$, but would probably be possible if it is trained for longer. This is plot is interesting to look at, but to get better idea of how 
 the network learned, we can actually take a look at the loss landscape.
 
 <Plot htmlPath="/html/partTwo/xor_loss_landscape.html"/>
-<div align="center"><i>Figure 21: Example Run Of Algorithm - Showing Loss Landscape With Sigmoid Activation Function</i></div>
+<div align="center"><i>Figure 21: Example Run Of Algorithm - Showing Loss Landscape With Sigmoid Activation Function([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 Looking at this loss landscape we can see why the network took so long to train, it seems that the optimal loss value (purple) lies in a narrow cavern. Making it pretty difficult to find, but due to the smooth landscape the gradients would still be easy to follow. The landscape is however much more complex compared to the loss landscape in the first article. Before we move on let's take a look at how the landscape changes when we change the parameters with which we trained the network. Instead of using the sigmoid activation function let's see what happens when we use the hyperbolic tangent function. The hyperbolic tangent function ($tanh$) is similar to the sigmoid by squashes values in the range $(-1,1)$:
 
 <Plot htmlPath="/html/partTwo/xor_loss_landscape_tanh.html"/>
-<div align="center"><i>Figure 22: Example Run Of Algorithm - Showing Loss Landscape With $Tanh$ Activation Function</i></div>
+<div align="center"><i>Figure 22: Example Run Of Algorithm - Showing Loss Landscape With $Tanh$ Activation Function([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 The landscape is a bit more shallow, which is more advantageous when training due to the fact that the gradients change more smoothly. This landscape is easier to train the neural network on since the landscape is smoother than the sigmoid landscape, the drops are a bit more gradual and don't form extremely deep valleys. This means there are less abrupt steps that could overshoot good solutions. Numerically the hyperbolic tangent is superior to the sigmoid function due to its higher derivative values, meaning we can extract more information from the gradients. Higher error values makes the backpropagation step more meaningful. Consider the plot below comparing the sigmoid and hyperbolic tangent derivative values (click on legend to hide certain plots):
 
 <Plot htmlPath="/html/partTwo/sigmoid_vs_tanh.html"/>
-<div align="center"><i>Figure 23: Sigmoid Vs Tanh</i></div>
+<div align="center"><i>Figure 23: Sigmoid Vs Tanh([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/sigmoid_vs_tanh.py))</i></div>
 
 In the above plot we see that the $tanh$ function has a steeper increase around $0$ when compared to the sigmoid function. Is the hyperbolic tangent function the best we can do? No, we can actually do better, let's consider a bit of an obscure function called *Mish*. The Mish function is plotted as follows:
 
 <Plot htmlPath="/html/partTwo/mish.html"/>
-<div align="center"><i>Figure 24: Mish Activation Function</i></div>
+<div align="center"><i>Figure 24: Mish Activation Function([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/sigmoid_vs_tanh.py))</i></div>
 
 The function is a weird one, the reasoning behind the function is that it will ensure large activation values when the input is positive and will fix anything that is negative to be close to $0$. It allows smaller activations when the input is around $0$, to allow for non-zero gradients which still allows gradient information to flow through the network when the activations are small. The reasoning for linearly scaling the positive inputs is to allow for *sparse* activations between neurons, meaning that neurons do not fire at the same time. This is not too important in our toy neural network, but is still good to know. Let's compare it with the sigmoid and hyperbolic tangent functions to analyse its usefulness:
 
 <Plot htmlPath="/html/partTwo/sigmoid_vs_tanh_vs_mish.html"/>
-<div align="center"><i>Figure 25: Sigmoid vs $Tanh$ vs Mish</i></div>
+<div align="center"><i>Figure 25: Sigmoid vs $Tanh$ vs Mish([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/sigmoid_vs_tanh.py))</i></div>
 
 Comparing the derivative values, we see that as the input gets larger the derivative will get closer to $1$, whereas the sigmoid and $tanh$ derivatives get closer to $0$. Also for negative values it still ensures that the gradient value is close to $0$, but not exactly so it still allows gradient information to flow back through the network. Let's discover how the Mish function affects the loss landscape for our neural network:
 
 <Plot htmlPath="/html/partTwo/xor_loss_landscape_mish.html"/>
-<div align="center"><i>Figure 26: Example Run Of Algorithm - Showing Loss Landscape With Mish Activation Function</i></div>
+<div align="center"><i>Figure 26: Example Run Of Algorithm - Showing Loss Landscape With Mish Activation Function([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 The Mish function gives us the best possible loss landscape. This is due to the optimal loss value region is flat and much larger than $tanh$ function and sigmoid functions. This means it is simple for the neural network to learn. The landscape even though flat is smooth, with no local minima so following the gradients will take you to the most optimal loss region. To reinforce the impact the Mish activation has on the training a neural network, we can plot the loss values of the epochs during training:
 
 <Plot htmlPath="/html/partTwo/loss_run_mish.html"/>
-<div align="center"><i>Figure 27: Example Run Of Algorithm - Showing Loss Over Epochs</i></div>
+<div align="center"><i>Figure 27: Example Run Of Algorithm - Showing Loss Over Epochs([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 The neural network as able to learn the XOR gate output in roughly $400$ epochs, which is a huge improvement to the sigmoid activation function.
 
@@ -422,7 +422,7 @@ To further solidify our understanding of neural networks, we need to be able to 
 To answer the question of adding more neurons we'll use an example dataset which requires at least three neurons in the hidden layer:
 
 <Plot htmlPath="/html/partTwo/cocentric_circles.html"/>
-<div align="center"><i>Figure 28: Two Cocentric Circles Classification Dataset</i></div>
+<div align="center"><i>Figure 28: Two Cocentric Circles Classification Dataset([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/cocentric_circles.py))</i></div>
 
 This two circles dataset is a classic example in showing the importance of dimensionality in a neural network. This particular dataset can not be learned by our current XOR gate neural network architecture. The reason being that the dataset can not be trivially transformed in such a way that the points can be linearly separated in two dimensions, but it is possible to do by adding another dimension. We've only looked at decision boundaries in a 2D space, but if we add another neuron to our hidden layer we can project our 2D input ($x$ and $y$ values of points) into a 3D space. So let's ammend our XOR gate neural network architecture to the following:
 
@@ -433,7 +433,7 @@ By adding the third neuron in the hidden layer, we can project the two dimension
 Training a neural network on this dataset for $2,000$ epochs and a learning rate of $0.01$ we get the following transformation in the hidden layer:
 
 <Plot htmlPath="/html/partTwo/cocentric_circles_transformation.html"/>
-<div align="center"><i>Figure 29: Trained Neural Network Hidden Layer Transformation On Cocentric Circles Dataset</i></div>
+<div align="center"><i>Figure 29: Trained Neural Network Hidden Layer Transformation On Cocentric Circles Dataset([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/cocentric_transformation.py))</i></div>
 
 Rotating the plot a bit you should see how the points could be separated by a hyperplane. You can imagine a hyperplane as a piece of paper that you can use to separate data points.
 
