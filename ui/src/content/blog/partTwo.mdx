@@ -16,8 +16,8 @@ import { Image } from 'astro:assets';
 In the first article we explored the perceptron, which is a model that is able to classify a linearly separable set of inputs. 
 Now you might have wondered, how does this help us do object recognition or build Chat-GPT? 
 Well unfortunately we live in a world where not all problems are linearly separable, but are more complex.
-During the 1950s the excitement around the perceptron was short-lived, as the limitations were quickly realised. As famously pointed out in the book *Perceptrons: An Introduction to Computational Geometry*. It pointed out it could not solve linearly inseparable problems such as the XOR gate problem.
-After this period the world entered what is more commonly known as the 'AI Winter', which was a period of time when it was difficult to find funding for any AI related projects, as overcoming the limitations of the perceptron proved to be a challenge. During this time it was however theorised that stitching together multiple perceptrons would overcome the limitations of a single perceptron. However, no one at the time was sure how you would train such a model, the problem being that there was uncertainty around how to adjust the weights of the model in a sensible way. We'll explore what this means during this article, the solution unsurprisingly being a bit of imagination and a bit of mathematics. The breakthrough was that we could treat neural netoworks as differentiable functions, which means we could analyse how the parameters of the neural network contributed to its output. This allowed the development of what is now the core step in training all modern-day neural networks: the backpropagation algorithm. 
+During the 1950s the excitement around the perceptron was short-lived, as the limitations were quickly realised. As famously pointed out in the book *Perceptrons: An Introduction to Computational Geometry*. It explained that the perceptron could not solve linearly *inseparable* problems such as the XOR gate problem.
+After this period the world entered what is more commonly known as the 'AI Winter', which was a period of time when it was difficult to find funding for any AI related projects, as overcoming the limitations of the perceptron proved to be a challenge. During this time it was however theorised that stitching together multiple perceptrons would overcome the limitations of a single perceptron. However, no one at the time was sure how you would train such a model, the problem being that there was uncertainty around how to adjust the weights of the model in a sensible way. We'll explore what this means during this article, the solution unsurprisingly being a bit of imagination and some mathematics. The breakthrough was that we could treat neural networks as differentiable functions, which means we could analyse how the parameters of the neural network contributed to its output. This allowed the development of what is now the core step in training all modern-day neural networks: the backpropagation algorithm. 
 
 ### The Problem
 
@@ -26,7 +26,7 @@ Consider the XOR gate, famous for being the exact counter-example for highlighti
 <Image src="/images/partTwo/xorGate.png" alt="XOR Gate" width={1020} height={490} loading="lazy" />
 <div align="center"><i>Figure 1: XOR Gate ([Credit](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.build-electronic-circuits.com%2Fxor-gate%2F&psig=AOvVaw3gIq6CdxXKCSTAbmXu0bPh&ust=1730828489106000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCICnxtucw4kDFQAAAAAdAAAAABAE))</i></div>
 
-Conceptually an XOR gate is used to represent an exclusive or logic operation, which means it will only energize when one of the inputs is $1$, but not both. At a surface level it might not seem impossible for a perceptron to be able to predict the outputs of an XOR gate. If the perceptron was able to predict the outputs of an AND gate, what prevents it from predicting the output of an XOR gate? Let's plot a possible decision boundary to see why this is not possible to with a single perceptron.
+Conceptually an XOR gate is used to represent an exclusive or logic operation, which means it will only energize when one of the inputs is $1$, but not both. At a surface level it might not seem impossible for a perceptron to be able to predict the outputs of an XOR gate. If the perceptron was able to predict the outputs of an AND gate, what prevents it from predicting the output of an XOR gate? Let's plot a possible decision boundary to see why this is not possible to do with a single perceptron.
 
 <Plot htmlPath="/html/partTwo/xor_non_linear.html"/>
 <div align="center"><i>Figure 2: XOR Gate With Non-Linear Decision Boundary([Script](https://github.com/meshtrade/mesh-dev-blog/tree/master/code/partTwo/xor_non_linear_boundary.py))</i></div>
@@ -59,7 +59,7 @@ To solve this problem we first need to define what the two decision boundaries w
 
 A possible strategy here would be that each decision boundary should be able to learn when given the inputs $(0,0)$ and $(1,1)$ the output should be $0$. We know that the perceptron will only be able to classify whether an input is below or above the line. 
 Considering the plot on the left-handside, it groups $\{(1,1), (0,1), (1,0)\}$ which we could train it to classify as $1$ and the input $(1,1)$ would falsely be correctly be predicted as $1$. This boundary does however classify the input $(0,0)$ correctly. The plot on the right groups the points $\{(0,0), (0,1), (1,0)\}$ together, but not $(1,1)$. Giving us a false positive for the input $(1,1)$.
-This is promising at least, the perceptrons should at least theoretically be able to classify three out of the four inputs, albeit for two different partitions of the input, but our two perceptrons will not be able to emulate the XOR gate with $100\%$ accuracy with these two decision boundaries. If the perceptrons work together they can make up for the mistake of the other perceptron. What if the outputs of the perceptrons were treated as the inputs for another third perceptron?
+This is promising, the perceptrons should at least theoretically be able to classify three out of the four inputs, albeit for two different partitions of the input, but our two perceptrons will not be able to emulate the XOR gate with $100\%$ accuracy with these two decision boundaries. If the perceptrons work together they can make up for the mistake of the other perceptron. What if the outputs of the perceptrons were treated as the inputs for another third perceptron?
 
 That could work, but before we construct an architecture for it, let's analyse why this would work (theoretically). Fix the perceptron represented by the decision boundary on the left in Figure 5 to be *perceptron $1$* and the right plot to be *perceptron $2$*.
 For this example, we make a bit of an obscure assumption, but will make sense in a second. Assume that the second perceptron will learn
@@ -73,12 +73,12 @@ Here we see something interesting emerge, if we look at the outputs of the two p
 <Image src="/images/partTwo/duplicatePerceptronWithOutputArchitecture.png" alt="two perceptron with output architecture" width={1020} height={490} loading="lazy" />
 <div align="center"><i>Figure 7: XOR Gate Neural Network</i></div>
 
-This architecture forms a *neural network*, a neural network is described in terms of layers. The inputs form the input layer, which is then fed into the *hidden layer*. Our *hidden layer* consists of two neurons and is responsible for preparing the data before sending it to the *output layer*. The *output layer* in our architecture consists of a single neuron and is responsible for producing the output value. 
-The weights connecting the two hidden layer perceptrons to the output perceptron are labelled as $w_{h1}$ and $w_{h2}$. This all seems very promising and like theorised in the 1950s seemed to be a promising approach. However, this is all theoretical, and we have not trained the model just yet. Scientists discussed this as a possible model of how would solve the problem of predicting the output of an XOR gate and other more complex problems, but were quickly stumped when they attempted to define the training algorithm. The issue being that it was not clear how to update all the weights and biases in a meaningful way. How would you propogate the error value from the output perceptron to the previous two perceptrons that fed into it. Issue being that the perceptrons feeding their outputs into the last perceptron don't know that they are actually predicting the output of an XOR gate, they just know they are feeding into some other output neuron. The output neuron is actually responsible for producing an output, which will in turn dictate the error value. This issue stumped AI researchers for quite a few years, this is until the discovery of the back-propogation was made.
+This architecture forms a *neural network*, a neural network is described in terms of layers. The inputs form the *input layer*, which is then fed into the *hidden layer*. Our *hidden layer* consists of two neurons and is responsible for preparing the data before sending it to the *output layer*. The *output layer* in our architecture consists of a single neuron and is responsible for producing the output value. 
+The weights connecting the two hidden layer perceptrons to the output perceptron are labelled as $w_{h1}$ and $w_{h2}$. This all seems very promising and like theorised in the 1950s seemed to be a promising approach. However, this is all theoretical, and we have not trained the model just yet. Scientists discussed this as a possible model of how would solve the problem of predicting the output of an XOR gate and other more complex problems, but were quickly stumped when they attempted to define the training algorithm. The issue being that it was not clear how to update all the weights and biases in a meaningful way. How would you propogate the error value from the output perceptron to the previous two perceptrons that fed into it. Issue being that the perceptrons feeding their outputs into the last perceptron don't know that they are actually predicting the output of an XOR gate, they just know they are feeding into some other output neuron. The output neuron is actually responsible for producing an output, which will in turn dictate the error value. This issue stumped AI researchers for quite a few years, this is until the discovery of the backpropogation was made.
 
 ### Calculus To The Rescue
 
-To train a neural network to successfuly for a particular task you need to mimise some pre-defined loss function, much like with the perceptron. On that point let's take a step back and take a look again at how training a single perceptron works, by looking at how it learns the optimal decision boundary. Learning the decision boundary is simply a side effect of minimising the loss function. Consider a simplified perceptron which only takes
+To train a neural network successfuly for a particular task you need to mimise some predefined loss function, much like with the perceptron. On that point let's take a step back and take a look again at how training a single perceptron works, by looking at how it learns the optimal decision boundary. Learning the decision boundary is simply a side effect of minimising the loss function. Consider a simplified perceptron which only takes
 a single input value, the computation it performs given an input value $x$ is expressed as: $x \times w + b$ (ignoring the activation function for now).
 Experiment with the sliders to see if you can get the loss to reach $0$.
 
@@ -120,15 +120,15 @@ calculation, but rather *indirectly*.
 Looking back on the layered approach we took in constructing the neural network in the previous section, if we could establish a relationship between the parameters of the perceptrons and the final output of the neural network, we could then determine how the weights and biases should be updated. Expressed differently we want to know how to change the weights and biases with respect to the error/loss value. To be able to do this we need to change our views of a neural network slightly. We've been hinting at this fact, perceptrons can be seen as mathematical functions so a multi-layer network could then also be expressed as a single function composed of sub-functions. Taking our theoretical XOR gate neural network architecture we could rewrite the computation it performs as:
 
 <div align="center">
-    $f(x, w, b) = \sigma(w_{h1} \times g(x, w, b) + w_{h2} \times k(x, w, b)) + b_h$
+    $f(x, w, b) = \sigma(w_{h1} \times g(x, w, b) + w_{h2} \times k(x, w, b) + b_h)$
 </div>
 
 where
 
 <div align="center">
-    $g(x, w, b) = \sigma(w_{11} \times A + w_{21} \times B) + b_1$
+    $g(x, w, b) = \sigma(w_{11} \times A + w_{21} \times B + b_1)$
 
-    $k(x, w, b) = \sigma(w_{12} \times A + w_{22} \times B) + b_2$
+    $k(x, w, b) = \sigma(w_{12} \times A + w_{22} \times B + b_2)$
 </div>
 
 where the outputs of the perceptrons in the first layer are represented by $g(x, w, b)$ and $k(x, w, b)$. Let the error value be the mean-squared error expressed by the equation:
@@ -364,11 +364,11 @@ Finally we have everything we need to start training and analysing a neural netw
     3.2 Output = Output Activation Function(Hidden Layer Output * (Output Weight Matrix) + b)
 4. Calculate ∂Loss / ∂(w/b) for every weight and bias in the neural network
 5. Update every weight and bias:
-    5.1 w' = w + learning_rate * ∂Loss / ∂w 
-    5.2 b' = b + learning_rate * ∂Loss / ∂b
+    5.1 w' = w - learning_rate * ∂Loss / ∂w 
+    5.2 b' = b - learning_rate * ∂Loss / ∂b
 6. Repeat steps 2-5 a specified number of times
 ```
-<div align="center"><i>Algorithm 1: Neural Network Training Algorithm</i></div>
+<div align="center"><i>Algorithm 1: Neural Network Training Algorithm([Script](https://github.com/meshtrade/mesh-dev-blog/blob/master/code/partTwo/train.py))</i></div>
 
 The process of calculating the output and the loss values is known as *forward propagation* (steps 2-3).
 Updating the weights and biases is known as *back propagation* (steps 4-5). These two procedures summarise

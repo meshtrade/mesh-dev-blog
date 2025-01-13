@@ -58,11 +58,11 @@ fig.add_trace(go.Scatter(
 ), row=1, col=2)
 
 # Layout updates for each axis
-fig.update_xaxes(range=[-0.5, 1.5], title="x1", row=1, col=1)
-fig.update_yaxes(range=[-0.5, 1.5], title="x2", row=1, col=1)
+fig.update_xaxes(range=[-0.5, 1.5], title="A", row=1, col=1)
+fig.update_yaxes(range=[-0.5, 1.5], title="B", row=1, col=1)
 
-fig.update_xaxes(range=[-0.5, 1.5], title="x1", row=1, col=2)
-fig.update_yaxes(range=[-0.5, 1.5], title="x2", row=1, col=2)
+fig.update_xaxes(range=[-0.5, 1.5], title="A", row=1, col=2)
+fig.update_yaxes(range=[-0.5, 1.5], title="B", row=1, col=2)
 
 # Layout details
 fig.update_layout(title="XOR Decision Boundaries", showlegend=False)

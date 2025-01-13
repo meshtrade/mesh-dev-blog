@@ -2,13 +2,15 @@
 interface Props {
 	htmlPath: string;
     refresh?: boolean;
+    height?: number;
 }
+import { propsToFilename } from "astro/assets/utils";
 import Refresh from "./Refresh.astro";
 
-const { htmlPath, refresh } = Astro.props;
+const { htmlPath, refresh, height } = Astro.props;
 ---
 <div class="plot">
-    <iframe id={"plotframe-"+htmlPath} src={htmlPath} width="100%" height="600px" style="border:none;" title="loss landscape" loading="lazy" class="plot-iframe">
+    <iframe id={"plotframe-"+htmlPath} src={htmlPath} width="100%" height={height ? height : "600px"} style="border:none;" title="loss landscape" loading="lazy" class="plot-iframe">
         Data
     </iframe>
     { refresh &&

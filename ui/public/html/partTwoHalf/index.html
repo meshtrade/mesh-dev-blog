@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Context Window</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls input, .controls button {
+            font-size: 16px;
+            margin: 5px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+        .controls input:focus {
+            border-color: #007bff;
+        }
+        .controls button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        svg {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .word {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .target {
+            fill: white;
+        }
+        .context {
+            fill: white;
+        }
+        .normal {
+            fill: #555;
+        }
+        .highlight-target {
+            fill: #6f00ff;
+            stroke: #6f00ff;
+            height: 28px;
+            rx: 6;
+            ry: 6;
+        }
+        .highlight-context {
+            fill: #f674e9;
+            stroke: #f674e9;
+            height: 28px;
+            rx: 6;
+            ry: 6;
+        }
+        .pairs {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pairs p {
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            margin: 0;
+        }
+        #sentence {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sliding Context Window Visualization</h1>
+    <div class="controls">
+        <input type="text" id="sentence" value="The quick brown fox jumps over the lazy dog" />
+        <label for="window-size">Window Size: </label>
+        <input type="number" id="window-size" min="1" value="3" />
+        <button id="play-btn">Play</button>
+        <button id="pause-btn">Pause</button>
+    </div>
+    <svg id="context-window-viz" width="600" height="350"></svg>
+    <div class="pairs">
+        <h3>Target-Context Pairs:</h3>
+        <div id="pairs-container"></div>
+    </div>
+
+    <script>
+        let currentFrame = 0;
+        let intervalId = null;
+
+        function initVisualization(sentence, windowSize) {
+            const svg = d3.select("#context-window-viz");
+            svg.selectAll("*").remove();
+            d3.select("#pairs-container").html("");
+
+            const words = sentence.split(" ");
+            const width = +svg.attr("width");
+            const height = +svg.attr("height");
+            const wordSpacing = width / (words.length + 1);
+
+            const wordGroup = svg.append("g")
+                .attr("transform", `translate(0, ${height / 2})`);
+
+            const wordElements = wordGroup.selectAll(".word")
+                .data(words)
+                .enter()
+                .append("g")
+                .attr("class", "word")
+                .attr("transform", (d, i) => `translate(${wordSpacing * (i + 1)}, 0)`);
+
+            wordElements.append("rect")
+                .attr("class", "background")
+                .attr("x", -30)
+                .attr("y", -20)
+                .attr("width", 60)
+                .attr("height", 40)
+                .attr("fill", "none");
+
+            wordElements.append("text")
+                .attr("class", "normal")
+                .attr("text-anchor", "middle")
+                .text(d => d);
+
+            function updateHighlights() {
+                const startIdx = currentFrame;
+                const endIdx = Math.min(currentFrame + windowSize, words.length);
+                const targetIdx = Math.floor((startIdx + endIdx - 1) / 2);
+
+                // Reset pairs when starting a new cycle
+                if (currentFrame === 0) {
+                    d3.select("#pairs-container").html("");
+                }
+
+                // Animate background highlights
+                wordGroup.selectAll("rect.background")
+                    .transition()
+                    .duration(800)
+                    .attr("class", (d, i) => {
+                        if (i === targetIdx) return "background highlight-target";
+                        if (i >= startIdx && i < endIdx) return "background highlight-context";
+                        return "background";
+                    });
+
+                // Animate text highlights
+                wordGroup.selectAll("text")
+                    .transition()
+                    .duration(800)
+                    .attr("class", (d, i) => {
+                        if (i === targetIdx) return "target";
+                        if (i >= startIdx && i < endIdx) return "context";
+                        return "normal";
+                    });
+
+                // Update target-context pairs
+                const contextWords = words.slice(startIdx, endIdx).filter((_, i) => i !== targetIdx - startIdx);
+                const targetWord = words[targetIdx];
+                const pairString = `Target: "${targetWord}" | Context: [${contextWords.map(w => `"${w}"`).join(", ")}]`;
+
+                d3.select("#pairs-container")
+                    .append("p")
+                    .text(pairString)
+                    .style("opacity", 0)
+                    .transition()
+                    .duration(800)
+                    .style("opacity", 1);
+            }
+
+            function playAnimation() {
+                if (intervalId) return;
+                intervalId = setInterval(() => {
+                    updateHighlights();
+                    currentFrame = (currentFrame + 1) % (words.length - windowSize + 1);
+                }, 1000);
+            }
+
+            function pauseAnimation() {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+
+            d3.select("#play-btn").on("click", playAnimation);
+            d3.select("#pause-btn").on("click", pauseAnimation);
+
+            updateHighlights();
+        }
+
+        d3.select("#sentence").on("input", function () {
+            const sentence = this.value;
+            const windowSize = +d3.select("#window-size").node().value;
+            currentFrame = 0;
+            initVisualization(sentence, windowSize);
+        });
+
+        d3.select("#window-size").on("input", function () {
+            const sentence = d3.select("#sentence").node().value;
+            const windowSize = +this.value;
+            currentFrame = 0;
+            initVisualization(sentence, windowSize);
+        });
+
+        const initialSentence = d3.select("#sentence").node().value;
+        const initialWindowSize = +d3.select("#window-size").node().value;
+        initVisualization(initialSentence, initialWindowSize);
+    </script>
+</body>
+</html>

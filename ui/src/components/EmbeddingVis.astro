@@ -1,0 +1,134 @@
+---
+
+---
+<style>
+    #scatter-plot {
+        margin: 10px;
+    }
+</style>
+<div class="plot-container">
+    <div id="scatter-plot"></div>
+</div>
+<script>
+    import { wiki_data } from "../scripts/wikiEmbed-sub2";
+    import * as d3 from "d3";
+
+    // Function to create scatter plot
+    function createScatterPlot(data: any, tooltips: any, config = {}) {
+        // Default configuration
+        const defaults = {
+            width: 600,
+            height: 400,
+            margin: { top: 20, right: 20, bottom: 50, left: 50 },
+            xLabel: "X Axis",
+            yLabel: "Y Axis",
+            title: "Scatter Plot",
+        };
+
+        // Merge default config with user config
+        const settings = { ...defaults, ...config };
+
+        // Calculate plot dimensions
+        const plotWidth =
+            settings.width - settings.margin.left - settings.margin.right;
+        const plotHeight =
+            settings.height - settings.margin.top - settings.margin.bottom;
+
+        // Clear any existing plot
+        d3.select("#scatter-plot").html("");
+
+        // Preprocess data to separate x and y coordinates
+        const formattedData = [];
+        for (let i = 0; i < data.length; i += 2) {
+            formattedData.push({ x: data[i], y: data[i + 1], tooltip: tooltips[i / 2] });
+        }
+
+        // Calculate x and y extents from formatted data
+        const xExtent = d3.extent(formattedData, (d) => d.x);
+        const yExtent = d3.extent(formattedData, (d) => d.y);
+
+        // Scales
+        const xScale = d3
+            .scaleLinear()
+            .domain([xExtent[0], xExtent[1]])
+            .range([0, plotWidth]); // Scale to chart width
+
+        const yScale = d3
+            .scaleLinear()
+            .domain([yExtent[0], yExtent[1]])
+            .range([plotHeight, 0]); // Scale to chart height
+
+        // Create SVG
+        const svg = d3
+            .select("#scatter-plot")
+            .append("svg")
+            .attr("width", settings.width)
+            .attr("height", settings.height)
+            .append("g")
+            .attr(
+                "transform",
+                `translate(${settings.margin.left},${settings.margin.top})`,
+            );
+
+        // X-axis
+        svg.append("g")
+            .attr("transform", `translate(0,${plotHeight})`)
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("x", plotWidth / 2)
+            .attr("y", 35)
+            .attr("fill", "black")
+            .text(settings.xLabel);
+
+        // Y-axis
+        svg.append("g")
+            .call(d3.axisLeft(yScale))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -plotHeight / 2)
+            .attr("y", -35)
+            .attr("fill", "black")
+            .text(settings.yLabel);
+
+        // Create tooltip div
+    const tooltipDiv = d3
+        .select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("background-color", "white")
+        .style("border", "1px solid #ccc")
+        .style("padding", "5px")
+        .style("border-radius", "4px")
+        .style("font-size", "12px");
+
+    // Scatter points
+    svg.selectAll("circle")
+        .data(formattedData)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => xScale(d.x))
+        .attr("cy", (d) => yScale(d.y))
+        .attr("r", 2)
+        .style("fill", "steelblue")
+        .style("opacity", 0.7)
+        .on("mouseover", (event, d) => {
+            tooltipDiv.style("visibility", "visible").text(d.tooltip);
+        })
+        .on("mousemove", (event) => {
+            tooltipDiv
+                .style("top", `${event.pageY - 10}px`)
+                .style("left", `${event.pageX + 10}px`);
+        })
+        .on("mouseout", () => {
+            tooltipDiv.style("visibility", "hidden");
+        });
+    }
+
+    // Create scatter plot with default settings
+    createScatterPlot(wiki_data.vs_sne, wiki_data.toks, {
+        title: "Sample Scatter Plot",
+        xLabel: "X Values",
+        yLabel: "Y Values",
+    });
+</script>
