@@ -1,0 +1,218 @@
+---
+interface Props {
+    audioURL: string;
+    contentType: string;
+}
+
+const { audioURL, contentType } = Astro.props;
+---
+
+<head>
+    <style>
+        #canvas {
+            width: 100%;
+            height: 300px;
+            background:
+                radial-gradient(
+                        circle at 100% 100%,
+                        #ffffff 0,
+                        #ffffff 3px,
+                        transparent 3px
+                    )
+                    0% 0%/8px 8px no-repeat,
+                radial-gradient(
+                        circle at 0 100%,
+                        #ffffff 0,
+                        #ffffff 3px,
+                        transparent 3px
+                    )
+                    100% 0%/8px 8px no-repeat,
+                radial-gradient(
+                        circle at 100% 0,
+                        #ffffff 0,
+                        #ffffff 3px,
+                        transparent 3px
+                    )
+                    0% 100%/8px 8px no-repeat,
+                radial-gradient(
+                        circle at 0 0,
+                        #ffffff 0,
+                        #ffffff 3px,
+                        transparent 3px
+                    )
+                    100% 100%/8px 8px no-repeat,
+                linear-gradient(#ffffff, #ffffff) 50% 50% / calc(100% - 10px)
+                    calc(100% - 16px) no-repeat,
+                linear-gradient(#ffffff, #ffffff) 50% 50% / calc(100% - 16px)
+                    calc(100% - 10px) no-repeat,
+                linear-gradient(
+                    8deg,
+                    rgba(249, 7, 16, 0.59) 0%,
+                    transparent 29.163%,
+                    rgba(225, 50, 44, 0.97) 70.558%,
+                    rgba(243, 12, 31, 0.23) 80.976%,
+                    #f3a60a 100%
+                ),
+                linear-gradient(
+                    97deg,
+                    #f01c3b 0%,
+                    #e51184 12.972%,
+                    #ee29ba 96.764%,
+                    #e6309e 100%
+                );
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .audio-container {
+            width: 100%;
+        }
+        audio {
+            width: 100%;
+        }
+    </style>
+</head>
+<canvas id="canvas"> </canvas>
+<div class="audio-container">
+    <audio id="audio" controls crossorigin="anonymous" preload="metadata">
+        <source
+            id="audio-src"
+            src={audioURL}
+            type={contentType || "audio/mpeg"}
+        />
+        Your browser does not support the audio element.
+    </audio>
+</div>
+<script type="module">
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+
+    // audio context
+    const audio = document.getElementById("audio");
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaElementSource(audio);
+    const analyser = audioContext.createAnalyser();
+
+    // Resize canvas to match display size and DPR
+    function resizeCanvas() {
+        // Set display size (CSS pixels)
+        canvas.style.width = `100%`;
+        canvas.style.height = "350px"; // Fixed height as before
+
+        // Set actual pixel size (accounting for DPR)
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = 350 * dpr;
+
+        // Scale the context to match DPR
+        ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // number of samples to take from audio signal
+    analyser.fftSize = 8192;
+
+    // have analyser analyse the source of the audio
+    source.connect(analyser);
+
+    // connect the output of the analyser to the current audio context
+    analyser.connect(audioContext.destination);
+
+    // depends on the frequency sampling
+    const bufferLength = analyser.frequencyBinCount;
+
+    // create buffer to hold audio data
+    const dataArray = new Uint8Array(bufferLength);
+
+    // define frequency bands
+    const numBands = 4; // number of waveforms
+    const bandSize = Math.floor(bufferLength / numBands);
+    const bands = [];
+    for (let i = 0; i < numBands; i++) {
+        const start = i * bandSize;
+        const end = i === numBands - 1 ? bufferLength : start + bandSize;
+        bands.push({ start, end });
+    }
+
+    // Initialize smoothed amplitudes
+    let smoothedAmplitudes = new Array(numBands).fill(0);
+    const smoothingFactor = 1.2; // Smooths amplitude changes
+
+    // Waveform parameters
+    const frequencies = [0.009, 0.006, 0.005, 0.008, 0.009]; // Spatial frequencies for sine waves
+    const phaseSpeeds = [0.3, 0.4, 0.9, 0.2, 0.3]; // Animation speeds
+    const colors = ["#C500CF", "#DC0451", "#ff0059", "#C500CF", "#C500CF"];
+
+    let time = 0;
+
+    function animate() {
+        const WIDTH = canvas.width / dpr;
+        const HEIGHT = canvas.height / dpr;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        // Draw center line
+        ctx.beginPath();
+        ctx.moveTo(0, HEIGHT / 2);
+        ctx.lineTo(WIDTH, HEIGHT / 2);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.stroke();
+
+        // Update audio data if playing
+        if (window.isAudioPlaying) {
+            analyser.getByteFrequencyData(dataArray);
+            const bandAmplitudes = bands.map((band) => {
+                const bandData = dataArray.slice(band.start, band.end);
+                const sum = bandData.reduce((a, b) => a + b, 0);
+                // return sum / bandData.length;
+                return sum * 0.0005;
+            });
+            smoothedAmplitudes = smoothedAmplitudes.map((smoothAmp, i) => {
+                return (
+                    smoothAmp * (1 - smoothingFactor) +
+                    bandAmplitudes[i] * smoothingFactor
+                );
+            });
+        }
+
+        const scaleFactor = HEIGHT / 4; // Scaling for waveform height
+
+        // Draw each waveform
+        for (let i = 0; i < numBands; i++) {
+            const amplitude = smoothedAmplitudes[i] / 255; // Dynamic amplitude for others
+            ctx.beginPath();
+            for (let x = 0; x < WIDTH; x++) {
+                const y =
+                    amplitude *
+                    Math.sin(x * frequencies[i] + time * phaseSpeeds[i]);
+                const scaledY = y * scaleFactor + HEIGHT / 2; // Center vertically
+                if (x === 0) {
+                    ctx.moveTo(x, scaledY);
+                } else {
+                    ctx.lineTo(x, scaledY);
+                }
+            }
+            ctx.strokeStyle = colors[i];
+            ctx.lineWidth = 4; // Thicker lines for visibility
+            ctx.stroke();
+        }
+
+        time += 0.01; // Increment time for animation
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    animate();
+
+    // Audio play/pause state
+    window.isAudioPlaying = false;
+    audio.onplay = () => {
+        if (audioContext.state === "suspended") audioContext.resume();
+        window.isAudioPlaying = true;
+    };
+    audio.onpause = () => {
+        window.isAudioPlaying = false;
+    };
+</script>

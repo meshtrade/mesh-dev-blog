@@ -169,3 +169,11 @@ hr {
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+.page-title {
+	text-align: center;
+	margin: 0.5em 0;
+	background: #C500CF;
+	background: linear-gradient(to right, #C500CF 0%, #DC0451 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}

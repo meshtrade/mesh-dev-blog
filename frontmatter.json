@@ -7,6 +7,10 @@
     {
       "title": "blog",
       "path": "[[workspace]]/ui/src/content/blog"
+    },
+    {
+      "title": "audio-recordings",
+      "path": "[[workspace]]/ui/src/content/audio-recordings"
     }
   ],
   "frontMatter.taxonomy.contentTypes": [
