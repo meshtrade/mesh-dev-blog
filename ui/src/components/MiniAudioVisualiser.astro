@@ -1,0 +1,171 @@
+---
+interface Props {
+    audioURL: string;
+    contentType: string;
+}
+
+const { audioURL, contentType } = Astro.props;
+---
+
+<head>
+    <style>
+        #canvas {
+        }
+        #audio {
+            width: 100%;
+        }
+        .disclaimer {
+            color: gray;
+            font-size: small;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<canvas id="canvas"/> 
+<div class="content-container">
+    <audio id="audio" controls crossorigin="anonymous" preload="metadata">
+        <source
+            id="audio-src"
+            src={audioURL}
+            type={contentType || "audio/mpeg"}
+        />
+        Your browser does not support the audio element.
+    </audio>
+    <p class="disclaimer">Listen while you read (Audio By <span class="mesh-text">Google&apos;s NotebookLM</span>)</p>
+</div>
+<script type="module">
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+
+    // audio context
+    const audio = document.getElementById("audio");
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaElementSource(audio);
+    const analyser = audioContext.createAnalyser();
+
+    // Resize canvas to match display size and DPR
+    function resizeCanvas() {
+        // Set display size (CSS pixels)
+        canvas.style.width = `75%`;
+        if (window.innerWidth < 720) {
+            canvas.style.width = `100%`;
+        }
+        canvas.style.height = "50px"; // Fixed height as before
+
+        // Set actual pixel size (accounting for DPR)
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = 50 * dpr;
+
+        // Scale the context to match DPR
+        ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // number of samples to take from audio signal
+    analyser.fftSize = 1024;
+
+    // have analyser analyse the source of the audio
+    source.connect(analyser);
+
+    // connect the output of the analyser to the current audio context
+    analyser.connect(audioContext.destination);
+
+    // depends on the frequency sampling
+    const bufferLength = analyser.frequencyBinCount;
+
+    // create buffer to hold audio data
+    const dataArray = new Uint8Array(bufferLength);
+
+    // define frequency bands
+    const numBands = 1; // number of waveforms
+    const bandSize = Math.floor(bufferLength / numBands);
+    const bands = [];
+    for (let i = 0; i < numBands; i++) {
+        const start = i * bandSize;
+        const end = i === numBands - 1 ? bufferLength : start + bandSize;
+        bands.push({ start, end });
+    }
+
+    // Initialize smoothed amplitudes
+    let smoothedAmplitudes = new Array(numBands).fill(0);
+    const smoothingFactor = 1.2; // Smooths amplitude changes
+
+    // Waveform parameters
+    const frequencies = [0.008, 0.006, 0.009, 0.008, 0.009]; // Spatial frequencies for sine waves
+    const phaseSpeeds = [0.3, 0.4, 0.9, 0.2, 0.3]; // Animation speeds
+    const colors = ["#C500CF", "#DC0451", "#ff0059", "#C500CF", "#C500CF"];
+
+    let time = 0;
+
+    function animate() {
+        const WIDTH = canvas.width / dpr;
+        const HEIGHT = canvas.height / dpr;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        // Draw center line
+        ctx.beginPath();
+        ctx.moveTo(0, HEIGHT / 2);
+        ctx.lineTo(WIDTH, HEIGHT / 2);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.stroke();
+
+        // Update audio data if playing
+        if (window.isAudioPlaying) {
+            analyser.getByteFrequencyData(dataArray);
+            const bandAmplitudes = bands.map((band) => {
+                const bandData = dataArray.slice(band.start, band.end);
+                const sum = bandData.reduce((a, b) => a + b, 0);
+                return sum / bandData.length * 4;
+            });
+            smoothedAmplitudes = smoothedAmplitudes.map((smoothAmp, i) => {
+                return (
+                    smoothAmp * (1 - smoothingFactor) +
+                    bandAmplitudes[i] * smoothingFactor
+                );
+            });
+        }
+
+        const scaleFactor = HEIGHT / 4; // Scaling for waveform height
+
+        // Draw each waveform
+        for (let i = 0; i < numBands; i++) {
+            const amplitude = smoothedAmplitudes[i] / 255; // Dynamic amplitude for others
+            ctx.beginPath();
+            for (let x = 0; x < WIDTH; x++) {
+                const y =
+                    amplitude *
+                    Math.sin(x * frequencies[i] + time * phaseSpeeds[i]);
+                const scaledY = y * scaleFactor + HEIGHT / 2; // Center vertically
+                if (x === 0) {
+                    ctx.moveTo(x, scaledY);
+                } else {
+                    ctx.lineTo(x, scaledY);
+                }
+            }
+            ctx.strokeStyle = colors[i];
+            ctx.lineWidth = 4; // Thicker lines for visibility
+            ctx.stroke();
+        }
+
+        time += 0.01; // Increment time for animation
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    animate();
+
+    // Audio play/pause state
+    window.isAudioPlaying = false;
+    audio.onplay = () => {
+        if (audioContext.state === "suspended") audioContext.resume();
+        window.isAudioPlaying = true;
+    };
+    audio.onpause = () => {
+        window.isAudioPlaying = false;
+    };
+</script>
