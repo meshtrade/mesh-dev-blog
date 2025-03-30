@@ -20,8 +20,12 @@ const { audioURL, contentType } = Astro.props;
             padding: 0;
             margin: 0;
         }
+        .visualiser-container {
+            overflow-y: hidden;
+        }
     </style>
 </head>
+<div class="visualiser-container">
 <canvas id="canvas"/> 
 <div class="content-container">
     <audio id="audio" controls crossorigin="anonymous" preload="metadata">
@@ -33,6 +37,7 @@ const { audioURL, contentType } = Astro.props;
         Your browser does not support the audio element.
     </audio>
     <p class="disclaimer">Listen while you read (Audio By <span class="mesh-text">Google&apos;s NotebookLM</span>)</p>
+</div>
 </div>
 <script type="module">
     const canvas = document.getElementById("canvas");
