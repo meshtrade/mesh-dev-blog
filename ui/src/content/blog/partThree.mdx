@@ -15,4 +15,26 @@ import Done from "../../components/Done.astro";
 
 <Scroll id="AI Visualised - Part III" />
 
-We've covered a lot of ground, and now we arrive at Deep Learning. Our exploration began with the perceptron, a fundamental unit adept at classifying linearly separable data. By interconnecting perceptrons, we created neural networks, significantly boosting their capacity to process and interpret complex data. We then explored embeddings, techniques that translate unstructured data into structured representations, revealing deeper insights into how neural networks encode and understand information. As an introduction to Deep Learning, we'll focus on Large Language Models (LLMs), specifically the classic transformer architecture. This approach diverges from the traditional use of Convolutional Neural Networks (CNNs), often used to introduce Deep Learning concepts.
+We've covered a lot of ground, and now we arrive at Deep Learning. Our exploration began with the perceptron, a fundamental unit adept at classifying linearly separable data. By interconnecting perceptrons, we created neural networks, significantly boosting their capacity to process and interpret complex data. We then explored embeddings, techniques that translate unstructured data into structured representations, revealing deeper insights into how neural networks encode and understand information. As an introduction to Deep Learning, we'll focus on Large Language Models (LLMs), specifically the classic transformer architecture. This approach diverges from the traditional use of Convolutional Neural Networks (CNNs), often used to introduce Deep Learning concepts. 
+
+## Deep Learning
+
+Deep learning is an approach that leverages the composability of neural networks layers. The naming for deep learning is literal as the neural networks are actually 'deeper', meaning multiple sometimes hundreds of hidden layers that are connected. In part II we considered networks with 1 or 2 hidden layers. 
+
+Now let's look at why it is useful to add more hidden layers, to understand that let's remember what a layer is and what it encodes. A layer consists of some number of neurons that is connected through a set of weights to a previous layer. To aid in our understanding we can think of a single neuron as encoding a specific attribute of the data. For example, in the first article we used a single neuron to represent an AND gate, in that case the perceptron learned to identify when the input was 1 and 1 which passed the activation threshold and cause the neuron to return 1. This is a very simple example, but at least provides the idea that neurons are able to selectively learn attributes of the training dataset. Recall in part I of this series the knowledge of the neuron had a geometric interpretation, the weights connected to the neuron could be used to construct the equation of a line which we referred to as the decision boundary.
+
+The training process will encode the dataset onto the neurons. One of the emergent attributes of neural networks is that when trained correctly (used a bit vaguely here) the neurons will 'organise' and 'coordinate' the attributes they learn.
+
+What we noticed is that each layer of connected neurons is in actuality a matrix of floating point numbers that when multiplied with a vector actually provides a linear transformation of that input vector.
+
+## Zero Layer Transformer
+
+Much like how we started this series with the humble perceptron, which can be thought of as a zero-layer transformer, don't worry what transformer means yet, we'll explore that in the next section. The zero-layer transformer is a simple model that will allow us to introduce some fundamental LLM-related concepts. First we look at the notion of **embeddings**, which we introduced in part II1/2. We quickly recap embeddings here, an embedding is a learned vector representation. In the context of language modelling, the object we want to model are words, more specifically the context in which words typically appear. This allows us to perform tasks such as sentiment classification, translation, text generation and autocomplete. 
+
+Embeddings are critical component in language modelling. As we saw in the Word2Vec model we can learn a vector representation of a word that will keep it close in vector space to words it appears next to. In the zero-layer transformer we do something similar, except instead of trying to predict the context of the word in bidrectionally we predict the context that follows the current word. The zero-layer transformer architecture looks like this:
+
+<Image src="/images/partTwo/xorGate.png" alt="XOR Gate" width={1020} height={490} loading="lazy" />
+<div align="center"><i>Figure 1: XOR Gate</i></div>
+
+
+
